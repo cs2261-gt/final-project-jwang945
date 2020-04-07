@@ -2,7 +2,7 @@
 #define PLAYERCOLS 3
 #define PLAYERSPRITESCALE 4
 #define MAXENEMIES 8
-#define MAXQUARANTINES 4
+#define MAXQUARANTINES 5
 #define MAXBULLETS 10
 
 void initGame();
@@ -12,6 +12,7 @@ void initQuarantines();
 void initBullets();
 void updateGame();
 void updatePlayer();
+void updateBullets();
 void fireBullet();
 
 typedef struct {

@@ -404,51 +404,45 @@ game:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r4, .L74
+	ldr	r3, .L69
+	ldr	r4, .L69+4
+	mov	lr, pc
+	bx	r3
 	mov	lr, pc
 	bx	r4
-	ldr	r3, .L74+4
+	ldr	r3, .L69+8
 	ldrh	r3, [r3]
 	tst	r3, #8
 	beq	.L58
-	ldr	r2, .L74+8
+	ldr	r2, .L69+12
 	ldrh	r2, [r2]
 	tst	r2, #8
-	beq	.L71
+	beq	.L67
 .L58:
-	tst	r3, #1
-	beq	.L60
-	ldr	r2, .L74+8
-	ldrh	r2, [r2]
-	tst	r2, #1
-	beq	.L72
-.L60:
 	tst	r3, #2
 	beq	.L57
-	ldr	r3, .L74+8
+	ldr	r3, .L69+12
 	ldrh	r3, [r3]
 	tst	r3, #2
-	beq	.L73
+	beq	.L68
 .L57:
 	pop	{r4, lr}
 	bx	lr
-.L71:
+.L67:
 	mov	lr, pc
 	bx	r4
 	mov	r2, #2
-	ldr	r3, .L74+12
+	ldr	r3, .L69+16
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
-.L72:
-	pop	{r4, lr}
-	b	goToWin
-.L73:
+.L68:
 	pop	{r4, lr}
 	b	goToLose
-.L75:
+.L70:
 	.align	2
-.L74:
+.L69:
+	.word	updateGame
 	.word	waitForVBlank
 	.word	oldButtons
 	.word	buttons
@@ -471,55 +465,55 @@ main:
 	mov	r1, #4352
 	push	{r4, r7, fp, lr}
 	strh	r2, [r3, #8]	@ movhi
-	ldr	r4, .L87
-	ldr	fp, .L87+4
+	ldr	r4, .L82
+	ldr	fp, .L82+4
 	ldrh	r2, [r4, #48]
 	strh	r1, [r3]	@ movhi
-	ldr	r3, .L87+8
+	ldr	r3, .L82+8
 	strh	r2, [fp]	@ movhi
 	mov	lr, pc
 	bx	r3
-	ldr	r6, .L87+12
-	ldr	r5, .L87+16
-	ldr	r10, .L87+20
-	ldr	r9, .L87+24
-	ldr	r8, .L87+28
-	ldr	r7, .L87+32
-.L77:
+	ldr	r6, .L82+12
+	ldr	r5, .L82+16
+	ldr	r10, .L82+20
+	ldr	r9, .L82+24
+	ldr	r8, .L82+28
+	ldr	r7, .L82+32
+.L72:
 	ldr	r2, [r6]
 	ldrh	r3, [fp]
-.L78:
+.L73:
 	strh	r3, [r5]	@ movhi
 	ldrh	r3, [r4, #48]
 	strh	r3, [fp]	@ movhi
 	cmp	r2, #4
 	ldrls	pc, [pc, r2, asl #2]
-	b	.L78
-.L80:
-	.word	.L83
-	.word	.L82
-	.word	.L81
-	.word	.L79
-	.word	.L79
-.L79:
+	b	.L73
+.L75:
+	.word	.L78
+	.word	.L77
+	.word	.L76
+	.word	.L74
+	.word	.L74
+.L74:
 	mov	lr, pc
 	bx	r7
-	b	.L77
-.L81:
+	b	.L72
+.L76:
 	mov	lr, pc
 	bx	r8
-	b	.L77
-.L82:
+	b	.L72
+.L77:
 	mov	lr, pc
 	bx	r9
-	b	.L77
-.L83:
+	b	.L72
+.L78:
 	mov	lr, pc
 	bx	r10
-	b	.L77
-.L88:
+	b	.L72
+.L83:
 	.align	2
-.L87:
+.L82:
 	.word	67109120
 	.word	buttons
 	.word	goToStart

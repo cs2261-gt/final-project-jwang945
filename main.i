@@ -156,6 +156,7 @@ void initialize();
 void game();
 void srand();
 void initGame();
+void updateGame();
 
 
 void goToStart();
@@ -250,14 +251,14 @@ void goToGame() {
 }
 
 void game() {
-
+    updateGame();
     waitForVBlank();
 
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
         goToPause();
-    else if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0)))))
-        goToWin();
+
+
     else if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1)))))
         goToLose();
 }
@@ -278,6 +279,7 @@ void pause() {
 }
 
 void goToWin() {
+
     waitForVBlank();
     state = WIN;
 
@@ -296,6 +298,7 @@ void win() {
 }
 
 void goToLose() {
+
     waitForVBlank();
     state = LOSE;
 

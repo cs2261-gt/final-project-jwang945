@@ -122,7 +122,11 @@ void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
+void initBullets();
 void updateGame();
+void updatePlayer();
+void updateBullets();
+void fireBullet();
 
 typedef struct {
     int row;
@@ -156,7 +160,7 @@ typedef struct {
 typedef struct {
     int row;
     int col;
-    int rdel;
+    int cdel;
     int width;
     int height;
     int active;
@@ -164,11 +168,8 @@ typedef struct {
 } BULLET;
 # 3 "game.c" 2
 # 1 "spritesheet.h" 1
-# 22 "spritesheet.h"
-extern const unsigned short spritesheetTiles[480];
-
-
-extern const unsigned short spritesheetMap[1024];
+# 21 "spritesheet.h"
+extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
@@ -178,19 +179,21 @@ extern const unsigned short spritesheetPal[256];
 OBJ_ATTR shadowOAM[128];
 PLAYER player;
 ENEMY enemies[8];
-QUARANTINE quarantines[4];
+QUARANTINE quarantines[5];
+BULLET bullets[10];
 
 void initGame() {
 
     DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512/2);
 
-    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 960/2);
+    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 32768/2);
 
     hideSprites();
 
     initPlayer();
     initEnemies();
     initQuarantines();
+    initBullets();
 
 
     waitForVBlank();
@@ -199,24 +202,24 @@ void initGame() {
 
 void initPlayer() {
 
-    player.row = 0;
-    player.col = 0;
+    player.row = 4;
+    player.col = 4;
     player.cdel = 40;
     player.rdel = 40;
     player.width = 32;
     player.height = 32;
 
 
-    shadowOAM[0].attr0 = 0 | (0<<13) | (0<<14);
-    shadowOAM[0].attr1 = 0 | (2<<14);
+    shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
+    shadowOAM[0].attr1 = player.col | (2<<14);
     shadowOAM[0].attr2 = ((0)*32+(0));
 }
 
 void initEnemies() {
 
     for (int i = 0; i < 8; i++) {
-        enemies[i].row = 2 * 40;
-        enemies[i].col = 4 * 40;
+        enemies[i].row = 2 * 40 + 4;
+        enemies[i].col = 4 * 40 + 4;
         enemies[i].cdel = 40;
         enemies[i].rdel = 40;
         enemies[i].width = 32;
@@ -232,7 +235,7 @@ void initEnemies() {
 }
 
 void initQuarantines() {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         quarantines[i].row = 0;
         quarantines[i].col = 0;
         quarantines[i].cdel = 40;
@@ -243,11 +246,28 @@ void initQuarantines() {
     }
 }
 
+void initBullets() {
+    for (int i = 0; i < 10; i++) {
+        bullets[i].row = player.row;
+        bullets[i].col = player.col;
+        bullets[i].cdel = 2;
+        bullets[i].width = 8;
+        bullets[i].height = 8;
+        bullets[i].active = 0;
+        bullets[i].erased = 0;
+    }
+}
 void updateGame() {
     updatePlayer();
+    updateBullets();
+
+
+    waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
 }
 
 void updatePlayer() {
+
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && player.row > 4) {
         player.row -= player.rdel;
     }
@@ -259,5 +279,43 @@ void updatePlayer() {
     }
     if ((!(~(oldButtons)&((1<<4))) && (~buttons & ((1<<4)))) && player.col < 84) {
         player.col += player.cdel;
+    }
+    if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0))))) {
+        fireBullet();
+    }
+
+
+    shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
+    shadowOAM[0].attr1 = player.col | (2<<14);
+    shadowOAM[0].attr2 = ((0)*32+(0));
+}
+
+void updateBullets() {
+    for (int i = 0; i < 10; i++) {
+        if (bullets[i].active == 1) {
+
+            bullets[i].col += bullets[i].cdel;
+            if (bullets[i].col > 240) {
+                bullets[i].active = 0;
+            }
+
+
+            shadowOAM[i + 14].attr0 = bullets[i].row | (0<<13) | (0<<14);
+            shadowOAM[i + 14].attr1 = bullets[i].col | (0<<14);
+            shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+        }
+    }
+}
+void fireBullet() {
+    for (int i = 0; i < 10; i++) {
+        if (bullets[i].active == 0) {
+
+            bullets[i].active = 1;
+
+            bullets[i].row = player.row + player.height/2 - bullets[i].height/2;
+            bullets[i].col = player.col + player.width;
+
+            break;
+        }
     }
 }

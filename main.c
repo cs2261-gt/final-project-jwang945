@@ -9,6 +9,7 @@ void initialize();
 void game();
 void srand();
 void initGame();
+void updateGame();
 
 // State Prototypes
 void goToStart();
@@ -103,14 +104,14 @@ void goToGame() {
 }
 
 void game() {
-    //updateGame(); //go to game logic
+    updateGame(); //go to game logic
     waitForVBlank();
 
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START))
         goToPause();
-    else if (BUTTON_PRESSED(BUTTON_A))
-        goToWin();
+    //else if (BUTTON_PRESSED(BUTTON_A))
+        //goToWin();
     else if (BUTTON_PRESSED(BUTTON_B))
         goToLose();
 }
@@ -131,6 +132,7 @@ void pause() {
 }
 
 void goToWin() {
+    
     waitForVBlank();
     state = WIN;
     //DMA palette
@@ -149,6 +151,7 @@ void win() {
 }
 
 void goToLose() {
+    
     waitForVBlank();
     state = LOSE;
     //DMA palette
