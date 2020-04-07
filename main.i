@@ -122,7 +122,7 @@ extern const unsigned short startscreenPal[256];
 # 3 "main.c" 2
 # 1 "mainscreen.h" 1
 # 22 "mainscreen.h"
-extern const unsigned short mainscreenTiles[464];
+extern const unsigned short mainscreenTiles[64];
 
 
 extern const unsigned short mainscreenMap[1024];
@@ -243,7 +243,7 @@ void goToGame() {
 
     DMANow(3, mainscreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, mainscreenTiles, &((charblock *)0x6000000)[0], 928/2);
+    DMANow(3, mainscreenTiles, &((charblock *)0x6000000)[0], 128/2);
 
     DMANow(3, mainscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
