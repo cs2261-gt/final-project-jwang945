@@ -8,6 +8,7 @@
 void initialize();
 void game();
 void srand();
+void initGame();
 
 // State Prototypes
 void goToStart();
@@ -85,7 +86,7 @@ void start() {
 
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START)) {
-        //initGame(); //go to game logic
+        initGame(); //go to game logic
         goToGame();
     }
 }

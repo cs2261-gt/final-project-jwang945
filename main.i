@@ -155,6 +155,7 @@ extern const unsigned short winscreenPal[256];
 void initialize();
 void game();
 void srand();
+void initGame();
 
 
 void goToStart();
@@ -232,7 +233,7 @@ void start() {
 
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
-
+        initGame();
         goToGame();
     }
 }

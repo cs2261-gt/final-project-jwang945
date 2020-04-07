@@ -176,6 +176,9 @@ start:
 	pop	{r4, lr}
 	bx	lr
 .L19:
+	ldr	r3, .L20+16
+	mov	lr, pc
+	bx	r3
 	pop	{r4, lr}
 	b	goToGame
 .L21:
@@ -185,6 +188,7 @@ start:
 	.word	seed
 	.word	oldButtons
 	.word	buttons
+	.word	initGame
 	.size	start, .-start
 	.align	2
 	.global	goToPause
