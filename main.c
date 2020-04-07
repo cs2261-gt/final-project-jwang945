@@ -1,4 +1,8 @@
 #include "myLib.h"
+#include "startscreen.h"
+#include "mainscreen.h"
+#include "losescreen.h"
+#include "winscreen.h"
 
 //prototypes
 void initialize();
@@ -67,11 +71,11 @@ void goToStart() {
     waitForVBlank();
     state = START;
     //DMA palette
-    //DMANow(3, startscreenPal, PALETTE, 256);
+    DMANow(3, startscreenPal, PALETTE, 256);
     //load tiles
-    //DMANow(3, startscreenTiles, &CHARBLOCK[0], startscreenTilesLen/2);
+    DMANow(3, startscreenTiles, &CHARBLOCK[0], startscreenTilesLen/2);
     //load map
-    //DMANow(3, startscreenMap, &SCREENBLOCK[16], startscreenMapLen/2);
+    DMANow(3, startscreenMap, &SCREENBLOCK[16], startscreenMapLen/2);
 }
 
 void start() {
@@ -90,11 +94,11 @@ void goToGame() {
     state = GAME;
     waitForVBlank();
     //DMA palette
-    //DMANow(3, mainscreenPal, PALETTE, 256);
+    DMANow(3, mainscreenPal, PALETTE, 256);
     //load tiles
-    //DMANow(3, mainscreenTiles, &CHARBLOCK[0], mainscreenTilesLen/2);
+    DMANow(3, mainscreenTiles, &CHARBLOCK[0], mainscreenTilesLen/2);
     //load map
-    //DMANow(3, mainscreenMap, &SCREENBLOCK[16], mainscreenMapLen/2);
+    DMANow(3, mainscreenMap, &SCREENBLOCK[16], mainscreenMapLen/2);
 }
 
 void game() {
@@ -104,10 +108,10 @@ void game() {
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START))
         goToPause();
-    // else if (BUTTON_PRESSED(BUTTON_A))
-    //     goToWin();
-    // else if (BUTTON_PRESSED(BUTTON_B))
-    //     goToLose();
+    else if (BUTTON_PRESSED(BUTTON_A))
+        goToWin();
+    else if (BUTTON_PRESSED(BUTTON_B))
+        goToLose();
 }
 
 void goToPause() {
@@ -129,11 +133,11 @@ void goToWin() {
     waitForVBlank();
     state = WIN;
     //DMA palette
-    //DMANow(3, winscreenPal, PALETTE, 256);
+    DMANow(3, winscreenPal, PALETTE, 256);
     //load tiles
-    //DMANow(3, winscreenTiles, &CHARBLOCK[0], winscreenTilesLen/2);
+    DMANow(3, winscreenTiles, &CHARBLOCK[0], winscreenTilesLen/2);
     //load map
-    //DMANow(3, winscreenMap, &SCREENBLOCK[16], winscreenMapLen/2);
+    DMANow(3, winscreenMap, &SCREENBLOCK[16], winscreenMapLen/2);
 }
 
 void win() {
@@ -147,11 +151,11 @@ void goToLose() {
     waitForVBlank();
     state = LOSE;
     //DMA palette
-    //DMANow(3, losescreenPal, PALETTE, 256);
+    DMANow(3, losescreenPal, PALETTE, 256);
     //load tiles
-    //DMANow(3, losescreenTiles, &CHARBLOCK[0], losescreenTilesLen/2);
+    DMANow(3, losescreenTiles, &CHARBLOCK[0], losescreenTilesLen/2);
     //load map
-    //DMANow(3, losescreenMap, &SCREENBLOCK[16], losescreenMapLen/2);
+    DMANow(3, losescreenMap, &SCREENBLOCK[16], losescreenMapLen/2);
 }
 
 void lose() {

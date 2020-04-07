@@ -110,6 +110,46 @@ typedef struct{
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "main.c" 2
+# 1 "startscreen.h" 1
+# 22 "startscreen.h"
+extern const unsigned short startscreenTiles[704];
+
+
+extern const unsigned short startscreenMap[1024];
+
+
+extern const unsigned short startscreenPal[256];
+# 3 "main.c" 2
+# 1 "mainscreen.h" 1
+# 22 "mainscreen.h"
+extern const unsigned short mainscreenTiles[464];
+
+
+extern const unsigned short mainscreenMap[1024];
+
+
+extern const unsigned short mainscreenPal[256];
+# 4 "main.c" 2
+# 1 "losescreen.h" 1
+# 22 "losescreen.h"
+extern const unsigned short losescreenTiles[112];
+
+
+extern const unsigned short losescreenMap[1024];
+
+
+extern const unsigned short losescreenPal[256];
+# 5 "main.c" 2
+# 1 "winscreen.h" 1
+# 22 "winscreen.h"
+extern const unsigned short winscreenTiles[320];
+
+
+extern const unsigned short winscreenMap[1024];
+
+
+extern const unsigned short winscreenPal[256];
+# 6 "main.c" 2
 
 
 void initialize();
@@ -178,11 +218,11 @@ void goToStart() {
     waitForVBlank();
     state = START;
 
+    DMANow(3, startscreenPal, ((unsigned short *)0x5000000), 256);
 
+    DMANow(3, startscreenTiles, &((charblock *)0x6000000)[0], 1408/2);
 
-
-
-
+    DMANow(3, startscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
 
 void start() {
@@ -201,11 +241,11 @@ void goToGame() {
     state = GAME;
     waitForVBlank();
 
+    DMANow(3, mainscreenPal, ((unsigned short *)0x5000000), 256);
 
+    DMANow(3, mainscreenTiles, &((charblock *)0x6000000)[0], 928/2);
 
-
-
-
+    DMANow(3, mainscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
 
 void game() {
@@ -215,10 +255,10 @@ void game() {
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
         goToPause();
-
-
-
-
+    else if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0)))))
+        goToWin();
+    else if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1)))))
+        goToLose();
 }
 
 void goToPause() {
@@ -240,11 +280,11 @@ void goToWin() {
     waitForVBlank();
     state = WIN;
 
+    DMANow(3, winscreenPal, ((unsigned short *)0x5000000), 256);
 
+    DMANow(3, winscreenTiles, &((charblock *)0x6000000)[0], 640/2);
 
-
-
-
+    DMANow(3, winscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
 
 void win() {
@@ -258,11 +298,11 @@ void goToLose() {
     waitForVBlank();
     state = LOSE;
 
+    DMANow(3, losescreenPal, ((unsigned short *)0x5000000), 256);
 
+    DMANow(3, losescreenTiles, &((charblock *)0x6000000)[0], 224/2);
 
-
-
-
+    DMANow(3, losescreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
 
 void lose() {
