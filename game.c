@@ -119,17 +119,31 @@ void updatePlayer() {
 
 void updateBullets() {
     for (int i = 0; i < MAXBULLETS; i++) {
-        if (bullets[i].active == 1) {
+        if (bullets[i].active) {
             //bullet movement
             bullets[i].col += bullets[i].cdel;
             if (bullets[i].col > 240) { //if goes off screen, set it as inactive
                 bullets[i].active = 0;
             }
-
-            //shadowOAM
-            shadowOAM[i + 14].attr0 = bullets[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-            shadowOAM[i + 14].attr1 = bullets[i].col | ATTR1_TINY;
-            shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
+            //check if collision with enemy
+            for (int j = 0; j < MAXENEMIES; j++) {
+                if (enemies[j].active) {
+                    if (collision(bullets[i].col, bullets[i].row, bullets[i].width, bullets[i].height, enemies[j].col, enemies[j].row, enemies[j].width, enemies[j].height)) {
+                        //if collision
+                        //hide bullet
+                        bullets[i].active = 0;
+                        bullets[i].erased = 1;
+                    }
+                }
+            }
+            if (bullets[i].erased) { //if bullet erased
+                shadowOAM[i + 14].attr0 = ATTR0_HIDE;
+            } else { //if not erased, add to shadowOAM
+                //shadowOAM
+                shadowOAM[i + 14].attr0 = bullets[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                shadowOAM[i + 14].attr1 = bullets[i].col | ATTR1_TINY;
+                shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
+            }
         }
     }
 }
@@ -138,6 +152,7 @@ void fireBullet() {
         if (bullets[i].active == 0) { //first inactive bullet
             //activate it
             bullets[i].active = 1;
+            bullets[i].erased = 0;
             //fire from player's location
             bullets[i].row = player.row + player.height/2 - bullets[i].height/2;
             bullets[i].col = player.col + player.width;

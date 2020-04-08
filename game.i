@@ -292,17 +292,31 @@ void updatePlayer() {
 
 void updateBullets() {
     for (int i = 0; i < 10; i++) {
-        if (bullets[i].active == 1) {
+        if (bullets[i].active) {
 
             bullets[i].col += bullets[i].cdel;
             if (bullets[i].col > 240) {
                 bullets[i].active = 0;
             }
 
+            for (int j = 0; j < 8; j++) {
+                if (enemies[j].active) {
+                    if (collision(bullets[i].col, bullets[i].row, bullets[i].width, bullets[i].height, enemies[j].col + 8, enemies[j].row, enemies[j].width, enemies[j].height)) {
 
-            shadowOAM[i + 14].attr0 = bullets[i].row | (0<<13) | (0<<14);
-            shadowOAM[i + 14].attr1 = bullets[i].col | (0<<14);
-            shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+
+                        bullets[i].active = 0;
+                        bullets[i].erased = 1;
+                    }
+                }
+            }
+            if (bullets[i].erased) {
+                shadowOAM[i + 14].attr0 = (2<<8);
+            } else {
+
+                shadowOAM[i + 14].attr0 = bullets[i].row | (0<<13) | (0<<14);
+                shadowOAM[i + 14].attr1 = bullets[i].col | (0<<14);
+                shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+            }
         }
     }
 }
@@ -311,6 +325,7 @@ void fireBullet() {
         if (bullets[i].active == 0) {
 
             bullets[i].active = 1;
+            bullets[i].erased = 0;
 
             bullets[i].row = player.row + player.height/2 - bullets[i].height/2;
             bullets[i].col = player.col + player.width;
