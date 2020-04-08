@@ -7,7 +7,7 @@ OBJ_ATTR shadowOAM[128]; //shadowOAM to DMA into realOAM
 PLAYER player; //OAM[0] 0-15
 ENEMY enemies[MAXENEMIES]; //OAM[1] - OAM[8] 16-31
 QUARANTINE quarantines[MAXQUARANTINES]; // OAM[9] - OAM[13]
-BULLET bullets[MAXBULLETS];// OAM[14] - OAM[23]
+SYRINGE syringes[MAXSYRINGES];// OAM[14] - OAM[23]
 
 void initGame() {
     //load sprite palette
@@ -20,7 +20,7 @@ void initGame() {
     initPlayer();
     initEnemies();
     initQuarantines();
-    initBullets();
+    initSyringes();
 
     //copy to real OAM
     waitForVBlank();
@@ -73,20 +73,20 @@ void initQuarantines() {
     }
 }
 
-void initBullets() {
-    for (int i = 0; i < MAXBULLETS; i++) {
-        bullets[i].row = player.row;
-        bullets[i].col = player.col;
-        bullets[i].cdel = 2;
-        bullets[i].width = 8;
-        bullets[i].height = 8;
-        bullets[i].active = 0;
-        bullets[i].erased = 0;
+void initSyringes() {
+    for (int i = 0; i < MAXSYRINGES; i++) {
+        syringes[i].row = player.row;
+        syringes[i].col = player.col;
+        syringes[i].cdel = 2;
+        syringes[i].width = 8;
+        syringes[i].height = 8;
+        syringes[i].active = 0;
+        syringes[i].erased = 0;
     }
 }
 void updateGame() {
     updatePlayer();
-    updateBullets();
+    updateSyringes();
 
     //copy to real OAM
     waitForVBlank();
@@ -108,7 +108,7 @@ void updatePlayer() {
         player.col += player.cdel;
     }
     if (BUTTON_PRESSED(BUTTON_A)) {
-        fireBullet();
+        fireSyringe();
     }
 
     //shadowOAM player
@@ -117,45 +117,45 @@ void updatePlayer() {
     shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
 }
 
-void updateBullets() {
-    for (int i = 0; i < MAXBULLETS; i++) {
-        if (bullets[i].active) {
-            //bullet movement
-            bullets[i].col += bullets[i].cdel;
-            if (bullets[i].col > 240) { //if goes off screen, set it as inactive
-                bullets[i].active = 0;
+void updateSyringes() {
+    for (int i = 0; i < MAXSYRINGES; i++) {
+        if (syringes[i].active) {
+            //syringe movement
+            syringes[i].col += syringes[i].cdel;
+            if (syringes[i].col > 240) { //if goes off screen, set it as inactive
+                syringes[i].active = 0;
             }
             //check if collision with enemy
             for (int j = 0; j < MAXENEMIES; j++) {
                 if (enemies[j].active) {
-                    if (collision(bullets[i].col, bullets[i].row, bullets[i].width, bullets[i].height, enemies[j].col, enemies[j].row, enemies[j].width, enemies[j].height)) {
+                    if (collision(syringes[i].col, syringes[i].row, syringes[i].width, syringes[i].height, enemies[j].col, enemies[j].row, enemies[j].width, enemies[j].height)) {
                         //if collision
-                        //hide bullet
-                        bullets[i].active = 0;
-                        bullets[i].erased = 1;
+                        //hide syringe
+                        syringes[i].active = 0;
+                        syringes[i].erased = 1;
                     }
                 }
             }
-            if (bullets[i].erased) { //if bullet erased
+            if (syringes[i].erased) { //if syringe erased
                 shadowOAM[i + 14].attr0 = ATTR0_HIDE;
             } else { //if not erased, add to shadowOAM
                 //shadowOAM
-                shadowOAM[i + 14].attr0 = bullets[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-                shadowOAM[i + 14].attr1 = bullets[i].col | ATTR1_TINY;
+                shadowOAM[i + 14].attr0 = syringes[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                shadowOAM[i + 14].attr1 = syringes[i].col | ATTR1_TINY;
                 shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
             }
         }
     }
 }
-void fireBullet() {
-    for (int i = 0; i < MAXBULLETS; i++) {
-        if (bullets[i].active == 0) { //first inactive bullet
+void fireSyringe() {
+    for (int i = 0; i < MAXSYRINGES; i++) {
+        if (syringes[i].active == 0) { //first inactive syringe
             //activate it
-            bullets[i].active = 1;
-            bullets[i].erased = 0;
+            syringes[i].active = 1;
+            syringes[i].erased = 0;
             //fire from player's location
-            bullets[i].row = player.row + player.height/2 - bullets[i].height/2;
-            bullets[i].col = player.col + player.width;
+            syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
+            syringes[i].col = player.col + player.width;
             //leave for-loop
             break;
         }

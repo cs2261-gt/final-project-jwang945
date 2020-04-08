@@ -122,11 +122,11 @@ void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
-void initBullets();
+void initSyringes();
 void updateGame();
 void updatePlayer();
-void updateBullets();
-void fireBullet();
+void updateSyringes();
+void fireSyringe();
 
 typedef struct {
     int row;
@@ -165,7 +165,7 @@ typedef struct {
     int height;
     int active;
     int erased;
-} BULLET;
+} SYRINGE;
 # 3 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
@@ -180,7 +180,7 @@ OBJ_ATTR shadowOAM[128];
 PLAYER player;
 ENEMY enemies[8];
 QUARANTINE quarantines[5];
-BULLET bullets[10];
+SYRINGE syringes[10];
 
 void initGame() {
 
@@ -193,7 +193,7 @@ void initGame() {
     initPlayer();
     initEnemies();
     initQuarantines();
-    initBullets();
+    initSyringes();
 
 
     waitForVBlank();
@@ -246,20 +246,20 @@ void initQuarantines() {
     }
 }
 
-void initBullets() {
+void initSyringes() {
     for (int i = 0; i < 10; i++) {
-        bullets[i].row = player.row;
-        bullets[i].col = player.col;
-        bullets[i].cdel = 2;
-        bullets[i].width = 8;
-        bullets[i].height = 8;
-        bullets[i].active = 0;
-        bullets[i].erased = 0;
+        syringes[i].row = player.row;
+        syringes[i].col = player.col;
+        syringes[i].cdel = 2;
+        syringes[i].width = 8;
+        syringes[i].height = 8;
+        syringes[i].active = 0;
+        syringes[i].erased = 0;
     }
 }
 void updateGame() {
     updatePlayer();
-    updateBullets();
+    updateSyringes();
 
 
     waitForVBlank();
@@ -281,7 +281,7 @@ void updatePlayer() {
         player.col += player.cdel;
     }
     if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0))))) {
-        fireBullet();
+        fireSyringe();
     }
 
 
@@ -290,45 +290,45 @@ void updatePlayer() {
     shadowOAM[0].attr2 = ((0)*32+(0));
 }
 
-void updateBullets() {
+void updateSyringes() {
     for (int i = 0; i < 10; i++) {
-        if (bullets[i].active) {
+        if (syringes[i].active) {
 
-            bullets[i].col += bullets[i].cdel;
-            if (bullets[i].col > 240) {
-                bullets[i].active = 0;
+            syringes[i].col += syringes[i].cdel;
+            if (syringes[i].col > 240) {
+                syringes[i].active = 0;
             }
 
             for (int j = 0; j < 8; j++) {
                 if (enemies[j].active) {
-                    if (collision(bullets[i].col, bullets[i].row, bullets[i].width, bullets[i].height, enemies[j].col + 8, enemies[j].row, enemies[j].width, enemies[j].height)) {
+                    if (collision(syringes[i].col, syringes[i].row, syringes[i].width, syringes[i].height, enemies[j].col, enemies[j].row, enemies[j].width, enemies[j].height)) {
 
 
-                        bullets[i].active = 0;
-                        bullets[i].erased = 1;
+                        syringes[i].active = 0;
+                        syringes[i].erased = 1;
                     }
                 }
             }
-            if (bullets[i].erased) {
+            if (syringes[i].erased) {
                 shadowOAM[i + 14].attr0 = (2<<8);
             } else {
 
-                shadowOAM[i + 14].attr0 = bullets[i].row | (0<<13) | (0<<14);
-                shadowOAM[i + 14].attr1 = bullets[i].col | (0<<14);
+                shadowOAM[i + 14].attr0 = syringes[i].row | (0<<13) | (0<<14);
+                shadowOAM[i + 14].attr1 = syringes[i].col | (0<<14);
                 shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
             }
         }
     }
 }
-void fireBullet() {
+void fireSyringe() {
     for (int i = 0; i < 10; i++) {
-        if (bullets[i].active == 0) {
+        if (syringes[i].active == 0) {
 
-            bullets[i].active = 1;
-            bullets[i].erased = 0;
+            syringes[i].active = 1;
+            syringes[i].erased = 0;
 
-            bullets[i].row = player.row + player.height/2 - bullets[i].height/2;
-            bullets[i].col = player.col + player.width;
+            syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
+            syringes[i].col = player.col + player.width;
 
             break;
         }

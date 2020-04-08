@@ -196,7 +196,7 @@ initGame:
 	.word	-32764
 	.word	player
 	.word	quarantines
-	.word	bullets
+	.word	syringes
 	.word	waitForVBlank
 	.size	initGame, .-initGame
 	.align	2
@@ -233,12 +233,12 @@ initQuarantines:
 	.word	quarantines
 	.size	initQuarantines, .-initQuarantines
 	.align	2
-	.global	initBullets
+	.global	initSyringes
 	.syntax unified
 	.arm
 	.fpu softvfp
-	.type	initBullets, %function
-initBullets:
+	.type	initSyringes, %function
+initSyringes:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
@@ -268,15 +268,15 @@ initBullets:
 	.align	2
 .L30:
 	.word	player
-	.word	bullets
-	.size	initBullets, .-initBullets
+	.word	syringes
+	.size	initSyringes, .-initSyringes
 	.align	2
-	.global	updateBullets
+	.global	updateSyringes
 	.syntax unified
 	.arm
 	.fpu softvfp
-	.type	updateBullets, %function
-updateBullets:
+	.type	updateSyringes, %function
+updateSyringes:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
@@ -314,11 +314,9 @@ updateBullets:
 	ldr	r3, [r4, #24]
 	cmp	r3, #0
 	beq	.L36
-	ldr	r3, [r4, #4]
+	ldm	r4, {r2, r3}
 	ldr	r0, [r4, #20]
 	ldr	r1, [r4, #16]
-	ldr	r2, [r4]
-	add	r3, r3, #8
 	str	r0, [sp, #12]
 	str	r1, [sp, #8]
 	str	r2, [sp, #4]
@@ -357,18 +355,18 @@ updateBullets:
 .L53:
 	.align	2
 .L52:
-	.word	bullets
+	.word	syringes
 	.word	shadowOAM+112
 	.word	collision
 	.word	enemies
-	.size	updateBullets, .-updateBullets
+	.size	updateSyringes, .-updateSyringes
 	.align	2
-	.global	fireBullet
+	.global	fireSyringe
 	.syntax unified
 	.arm
 	.fpu softvfp
-	.type	fireBullet, %function
-fireBullet:
+	.type	fireSyringe, %function
+fireSyringe:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
@@ -409,9 +407,9 @@ fireBullet:
 .L65:
 	.align	2
 .L64:
-	.word	bullets
+	.word	syringes
 	.word	player
-	.size	fireBullet, .-fireBullet
+	.size	fireSyringe, .-fireSyringe
 	.align	2
 	.global	updatePlayer
 	.syntax unified
@@ -502,7 +500,7 @@ updatePlayer:
 	strle	r2, [r4]
 	b	.L68
 .L93:
-	bl	fireBullet
+	bl	fireSyringe
 	b	.L71
 .L95:
 	.align	2
@@ -524,7 +522,7 @@ updateGame:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
 	bl	updatePlayer
-	bl	updateBullets
+	bl	updateSyringes
 	ldr	r3, .L98
 	mov	lr, pc
 	bx	r3
@@ -544,7 +542,7 @@ updateGame:
 	.word	DMANow
 	.word	shadowOAM
 	.size	updateGame, .-updateGame
-	.comm	bullets,280,4
+	.comm	syringes,280,4
 	.comm	quarantines,140,4
 	.comm	enemies,224,4
 	.comm	player,24,4

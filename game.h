@@ -3,17 +3,17 @@
 #define PLAYERSPRITESCALE 4
 #define MAXENEMIES 8
 #define MAXQUARANTINES 5
-#define MAXBULLETS 10
+#define MAXSYRINGES 10
 
 void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
-void initBullets();
+void initSyringes();
 void updateGame();
 void updatePlayer();
-void updateBullets();
-void fireBullet();
+void updateSyringes();
+void fireSyringe();
 
 typedef struct {
     int row;
@@ -52,4 +52,4 @@ typedef struct {
     int height;
     int active;
     int erased;
-} BULLET;
+} SYRINGE;
