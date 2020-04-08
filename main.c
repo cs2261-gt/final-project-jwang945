@@ -3,7 +3,7 @@
 #include "mainscreen.h"
 #include "losescreen.h"
 #include "winscreen.h"
-
+#include "instructionsscreen.h"
 //prototypes
 void initialize();
 void game();
@@ -24,9 +24,9 @@ void goToLose();
 void lose();
 
 // States for state machine
-enum {START, GAME, PAUSE, WIN, LOSE};
+enum {START, INSTRUCTION, GAME, PAUSE, WIN, LOSE};
 int state;
-
+int startScreenIndex;
 // button Variables
 unsigned short buttons;
 unsigned short oldButtons;
@@ -42,6 +42,9 @@ int main() {
         switch(state) {
             case START:
                 start();
+                break;
+            case INSTRUCTION:
+                instruction();
                 break;
             case GAME:
                 game();
@@ -69,6 +72,7 @@ void initialize() {
 }
 
 void goToStart() {
+    startScreenIndex = 0;
     seed = 0; //init seed
     waitForVBlank();
     state = START;
@@ -84,11 +88,38 @@ void start() {
 
     waitForVBlank();
     seed++; //increment seed depending on how long user stays on start screen
-
+    if (BUTTON_PRESSED(BUTTON_DOWN) && startScreenIndex == 0) {
+        startScreenIndex++;
+    }
+    if (BUTTON_PRESSED(BUTTON_UP) && startScreenIndex == 1) {
+        startScreenIndex--;
+    }
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START)) {
-        initGame(); //go to game logic
-        goToGame();
+        switch(startScreenIndex) {
+            case 0:
+                initGame();
+                goToGame();
+                break;
+            case 1:
+                goToInstructions();
+                break;
+        }
+    }
+}
+void goToInstructions() {
+    state = INSTRUCTION;
+    //DMA palette
+    DMANow(3, instructionsscreenPal, PALETTE, 256);
+    //load tiles
+    DMANow(3, instructionsscreenTiles, &CHARBLOCK[0], instructionsscreenTilesLen/2);
+    //load map
+    DMANow(3, instructionsscreenMap, &SCREENBLOCK[16], instructionsscreenMapLen/2);
+}
+void instruction() {
+    waitForVBlank();
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        goToStart();
     }
 }
 void goToGame() {

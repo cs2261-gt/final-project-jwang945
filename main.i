@@ -150,7 +150,16 @@ extern const unsigned short winscreenMap[1024];
 
 extern const unsigned short winscreenPal[256];
 # 6 "main.c" 2
+# 1 "instructionsscreen.h" 1
+# 22 "instructionsscreen.h"
+extern const unsigned short instructionsscreenTiles[176];
 
+
+extern const unsigned short instructionsscreenMap[1024];
+
+
+extern const unsigned short instructionsscreenPal[256];
+# 7 "main.c" 2
 
 void initialize();
 void game();
@@ -171,9 +180,9 @@ void goToLose();
 void lose();
 
 
-enum {START, GAME, PAUSE, WIN, LOSE};
+enum {START, INSTRUCTION, GAME, PAUSE, WIN, LOSE};
 int state;
-
+int startScreenIndex;
 
 unsigned short buttons;
 unsigned short oldButtons;
@@ -189,6 +198,9 @@ int main() {
         switch(state) {
             case START:
                 start();
+                break;
+            case INSTRUCTION:
+                instruction();
                 break;
             case GAME:
                 game();
@@ -216,6 +228,7 @@ void initialize() {
 }
 
 void goToStart() {
+    startScreenIndex = 0;
     seed = 0;
     waitForVBlank();
     state = START;
@@ -231,11 +244,38 @@ void start() {
 
     waitForVBlank();
     seed++;
-
+    if ((!(~(oldButtons)&((1<<7))) && (~buttons & ((1<<7)))) && startScreenIndex == 0) {
+        startScreenIndex++;
+    }
+    if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && startScreenIndex == 1) {
+        startScreenIndex--;
+    }
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
-        initGame();
-        goToGame();
+        switch(startScreenIndex) {
+            case 0:
+                initGame();
+                goToGame();
+                break;
+            case 1:
+                goToInstructions();
+                break;
+        }
+    }
+}
+void goToInstructions() {
+    state = INSTRUCTION;
+
+    DMANow(3, instructionsscreenPal, ((unsigned short *)0x5000000), 256);
+
+    DMANow(3, instructionsscreenTiles, &((charblock *)0x6000000)[0], 352/2);
+
+    DMANow(3, instructionsscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
+}
+void instruction() {
+    waitForVBlank();
+    if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
+        goToStart();
     }
 }
 void goToGame() {

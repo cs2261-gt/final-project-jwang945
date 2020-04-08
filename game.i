@@ -111,17 +111,19 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 14 "game.h"
+# 16 "game.h"
 int rand();
 void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
 void initSyringes();
+void initRNAs();
 void updateGame();
 void updatePlayer();
 void updateEnemies();
 void updateSyringes();
+void updateRNAs();
 void findSafeRowAndColForEnemy();
 void fireSyringe();
 
@@ -145,8 +147,8 @@ typedef struct {
     int health;
     int active;
     int erased;
-    int movementTimer;
     int spawnTimer;
+    int RNATimer;
 } ENEMY;
 
 typedef struct {
@@ -168,6 +170,16 @@ typedef struct {
     int active;
     int erased;
 } SYRINGE;
+
+typedef struct {
+    int row;
+    int col;
+    int cdel;
+    int width;
+    int height;
+    int active;
+    int erased;
+} RNA;
 # 3 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
@@ -183,6 +195,7 @@ PLAYER player;
 ENEMY enemies[8];
 QUARANTINE quarantines[5];
 SYRINGE syringes[10];
+RNA rnas[16];
 int enemiesOnScreen;
 int enemySpawnRate;
 
@@ -200,6 +213,7 @@ void initGame() {
     enemySpawnRate = 100 + (rand()%50);
     initQuarantines();
     initSyringes();
+    initRNAs();
 
 
     waitForVBlank();
@@ -234,8 +248,8 @@ void initEnemies() {
         enemies[i].health = 10;
         enemies[i].active = 0;
         enemies[i].erased = 0;
-        enemies[i].movementTimer = 0;
         enemies[i].spawnTimer = 0;
+        enemies[i].RNATimer = 0;
     }
 }
 
@@ -263,10 +277,22 @@ void initSyringes() {
     }
 }
 
+void initRNAs() {
+    for (int i = 0; i < 16; i++) {
+        rnas[i].row = 0;
+        rnas[i].col = 0;
+        rnas[i].cdel = 1;
+        rnas[i].width = 8;
+        rnas[i].height = 8;
+        rnas[i].active = 0;
+        rnas[i].erased = 0;
+    }
+}
 void updateGame() {
     updatePlayer();
     updateEnemies();
     updateSyringes();
+    updateRNAs();
 
 
     waitForVBlank();
@@ -318,6 +344,22 @@ void updateEnemies() {
     for (int i = 0; i < 8; i++) {
         if (enemies[i].active) {
 
+
+            enemies[i].RNATimer += 1;
+            if (enemies[i].RNATimer == 50) {
+                enemies[i].RNATimer = 0;
+
+                for (int j = 0; j < 16; j++) {
+                    if (!rnas[j].active) {
+                        rnas[j].active = 1;
+                        rnas[j].erased = 0;
+                        rnas[j].row = enemies[i].row + enemies[i].height/2 - rnas[j].height/2;
+                        rnas[j].col = enemies[i].col;
+                        break;
+                    }
+                }
+            }
+
             if (enemies[i].health <= 0) {
                 enemies[i].active = 0;
                 enemies[i].erased = 1;
@@ -368,6 +410,27 @@ void updateSyringes() {
         }
     }
 }
+
+void updateRNAs() {
+    for (int i = 0; i < 16; i++) {
+        if (rnas[i].active) {
+
+            rnas[i].col -= rnas[i].cdel;
+            if (rnas[i].col < 0) {
+                rnas[i].active = 0;
+            }
+
+            if (collision(player.col, player.row, player.width, player.height, rnas[i].col, rnas[i].row, rnas[i].width, rnas[i].height)) {
+
+
+                rnas[i].active = 0;
+                rnas[i].erased = 1;
+
+            }
+        }
+    }
+}
+
 void findSafeRowAndColForEnemy(ENEMY* e) {
     int found = 0;
     int col;

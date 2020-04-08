@@ -8,6 +8,7 @@ PLAYER player; //OAM[0] 0-15
 ENEMY enemies[MAXENEMIES]; //OAM[1] - OAM[8] 16-31
 QUARANTINE quarantines[MAXQUARANTINES]; // OAM[9] - OAM[13]
 SYRINGE syringes[MAXSYRINGES];// OAM[14] - OAM[23]
+RNA rnas[MAXRNAS];// OAM[24] - OAM[39]
 int enemiesOnScreen;
 int enemySpawnRate;
 
@@ -25,6 +26,7 @@ void initGame() {
     enemySpawnRate = ENEMYSPAWNRATEBASE + (rand()%50);
     initQuarantines();
     initSyringes();
+    initRNAs();
 
     //copy to real OAM
     waitForVBlank();
@@ -59,8 +61,8 @@ void initEnemies() {
         enemies[i].health = 10;
         enemies[i].active = 0;
         enemies[i].erased = 0;
-        enemies[i].movementTimer = 0;
         enemies[i].spawnTimer = 0;
+        enemies[i].RNATimer = 0;
     }
 }
 
@@ -88,10 +90,22 @@ void initSyringes() {
     }
 }
 
+void initRNAs() {
+    for (int i = 0; i < MAXRNAS; i++) {
+        rnas[i].row = 0;
+        rnas[i].col = 0;
+        rnas[i].cdel = 1;
+        rnas[i].width = 8;
+        rnas[i].height = 8;
+        rnas[i].active = 0;
+        rnas[i].erased = 0;
+    }
+}
 void updateGame() {
     updatePlayer();
     updateEnemies();
     updateSyringes();
+    updateRNAs();
 
     //copy to real OAM
     waitForVBlank();
@@ -142,6 +156,22 @@ void updateEnemies() {
     }
     for (int i = 0; i < MAXENEMIES; i++) {
         if (enemies[i].active) {
+            //enemy RNA logic
+            //increment their timer
+            enemies[i].RNATimer += 1;
+            if (enemies[i].RNATimer == ENEMYFIRERATE) {
+                enemies[i].RNATimer = 0; //reset fire timer
+                //fire RNA
+                for (int j = 0; j < MAXRNAS; j++) {
+                    if (!rnas[j].active) {
+                        rnas[j].active = 1;
+                        rnas[j].erased = 0;
+                        rnas[j].row = enemies[i].row + enemies[i].height/2 - rnas[j].height/2;
+                        rnas[j].col = enemies[i].col;
+                        break;
+                    }
+                }
+            }
             //check if enemy has been killed
             if (enemies[i].health <= 0) {
                 enemies[i].active = 0;
@@ -193,6 +223,27 @@ void updateSyringes() {
         }
     }
 }
+
+void updateRNAs() {
+    for (int i = 0; i < MAXRNAS; i++) {
+        if (rnas[i].active) {
+            //rna movement
+            rnas[i].col -= rnas[i].cdel;
+            if (rnas[i].col < 0) { //if it goes off screen, set it as inactive
+                rnas[i].active = 0;
+            }
+            //check for collision with player
+            if (collision(player.col, player.row, player.width, player.height, rnas[i].col, rnas[i].row, rnas[i].width, rnas[i].height)) {
+                //if collision
+                //hide rna
+                rnas[i].active = 0;
+                rnas[i].erased = 1;
+                //damage the player here
+            }
+        }
+    }
+}
+
 void findSafeRowAndColForEnemy(ENEMY* e) {
     int found = 0;
     int col;

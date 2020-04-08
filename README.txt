@@ -1,0 +1,1 @@
+Corona King:For milestone 2:You can navigate to the instructions page by pressing down and then start. Press start again to return back to the start screen.Move the player up, down, left, right to shoot the viruses and dodge their RNA! Press A to shoot. 
