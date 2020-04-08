@@ -9,6 +9,7 @@ ENEMY enemies[MAXENEMIES]; //OAM[1] - OAM[8] 16-31
 QUARANTINE quarantines[MAXQUARANTINES]; // OAM[9] - OAM[13]
 SYRINGE syringes[MAXSYRINGES];// OAM[14] - OAM[23]
 RNA rnas[MAXRNAS];// OAM[24] - OAM[39]
+HEART hearts[MAXHEARTS];// OAM[40] - OAM[45]
 int enemiesOnScreen;
 int enemySpawnRate;
 
@@ -22,6 +23,7 @@ void initGame() {
     initQuarantines();
     initSyringes();
     initRNAs();
+    initHearts();
 
     //copy to real OAM
     waitForVBlank();
@@ -37,7 +39,8 @@ void initPlayer() {
     player.width = 32;
     player.height = 32;
     player.damage = 1;
-
+    player.health = MAXHEARTS;
+    player.tookDamageFlag = 0;
     //shadowOAM player
     shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
     shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
@@ -96,11 +99,26 @@ void initRNAs() {
         rnas[i].erased = 0;
     }
 }
+
+void initHearts() {
+    for (int i = 0; i < MAXHEARTS; i++) {
+        hearts[i].row = 2;
+        hearts[i].col = 3 + (10 * i);
+        hearts[i].active = 1;
+        hearts[i].erased = 0;
+        //drawn them onto the screen
+        shadowOAM[i + 40].attr0 = hearts[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+        shadowOAM[i + 40].attr1 = hearts[i].col | ATTR1_TINY;
+        shadowOAM[i + 40].attr2 = ATTR2_TILEID(0, (3 * 4)+2);
+    }
+}
+
 void updateGame() {
     updatePlayer();
     updateEnemies();
     updateSyringes();
     updateRNAs();
+    updateHearts();
 
     //copy to real OAM
     waitForVBlank();
@@ -108,6 +126,10 @@ void updateGame() {
 }
 
 void updatePlayer() {
+    //check if player died
+    if (player.health <= 0) {
+        goToLose();
+    }
     //player movement logic
     if (BUTTON_PRESSED(BUTTON_UP) && player.row > GRIDTOPPIXEL) {
         player.row -= player.rdel;
@@ -124,11 +146,12 @@ void updatePlayer() {
     if (BUTTON_PRESSED(BUTTON_A)) {
         fireSyringe();
     }
-
+    if (player.health > 0) { //only draw if player is still alive
     //shadowOAM player
-    shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
-    shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
-    shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
+        shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
+        shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
+        shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
+    }
 }
 
 void updateEnemies() {
@@ -177,9 +200,11 @@ void updateEnemies() {
                 shadowOAM[i + 1].attr0 = ATTR0_HIDE;
             } else {
                 //not erased, continue to draw
-                shadowOAM[i + 1].attr0 = enemies[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-                shadowOAM[i + 1].attr1 = enemies[i].col | ATTR1_MEDIUM;
-                shadowOAM[i + 1].attr2 = ATTR2_TILEID(0, 1 * 4);
+                if (player.health > 0) {
+                    shadowOAM[i + 1].attr0 = enemies[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                    shadowOAM[i + 1].attr1 = enemies[i].col | ATTR1_MEDIUM;
+                    shadowOAM[i + 1].attr2 = ATTR2_TILEID(0, 1 * 4);
+                }
             }
         }
     }
@@ -211,9 +236,11 @@ void updateSyringes() {
                 shadowOAM[i + 14].attr0 = ATTR0_HIDE;
             } else { //if not erased, add to shadowOAM
                 //shadowOAM
-                shadowOAM[i + 14].attr0 = syringes[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-                shadowOAM[i + 14].attr1 = syringes[i].col | ATTR1_TINY;
-                shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
+                if (player.health > 0) {
+                    shadowOAM[i + 14].attr0 = syringes[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                    shadowOAM[i + 14].attr1 = syringes[i].col | ATTR1_TINY;
+                    shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
+                }
             }
         }
     }
@@ -235,14 +262,32 @@ void updateRNAs() {
                 rnas[i].active = 0;
                 rnas[i].erased = 1;
                 //damage the player here
+                player.health--;
+                player.tookDamageFlag = 1;
             }
             if (rnas[i].erased) { //if syringe erased, hide the sprite
                 shadowOAM[i + 24].attr0 = ATTR0_HIDE;
             } else {
                 //shadowOAM
-                shadowOAM[i + 24].attr0 = rnas[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-                shadowOAM[i + 24].attr1 = rnas[i].col | ATTR1_TINY;
-                shadowOAM[i + 24].attr2 = ATTR2_TILEID(0, (3 * 4)+1);
+                if (player.health > 0) {
+                    shadowOAM[i + 24].attr0 = rnas[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                    shadowOAM[i + 24].attr1 = rnas[i].col | ATTR1_TINY;
+                    shadowOAM[i + 24].attr2 = ATTR2_TILEID(0, (3 * 4)+1);
+                }
+            }
+        }
+    }
+}
+
+void updateHearts() {
+    if (player.tookDamageFlag) {
+        player.tookDamageFlag = 0; //reset flag
+        //erase a heart
+        for (int i = MAXHEARTS - 1; i >= 0; i--) {
+            if (hearts[i].active) {
+                hearts[i].active = 0;
+                shadowOAM[i + 40].attr0 = ATTR0_HIDE;
+                break;
             }
         }
     }

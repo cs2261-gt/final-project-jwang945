@@ -7,6 +7,7 @@
 #define MAXQUARANTINES 5
 #define MAXSYRINGES 10
 #define MAXRNAS 16
+#define MAXHEARTS 5
 #define GRIDTOPPIXEL 4
 #define GRIDBOTTOMPIXEL 124
 #define GRIDLEFTPIXEL 4
@@ -14,17 +15,20 @@
 #define ENEMYFIRERATE 200
 
 int rand();
+void goToLose();
 void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
 void initSyringes();
 void initRNAs();
+void initHearts();
 void updateGame();
 void updatePlayer();
 void updateEnemies();
 void updateSyringes();
 void updateRNAs();
+void updateHearts();
 void findSafeRowAndColForEnemy();
 void fireSyringe();
 
@@ -36,6 +40,8 @@ typedef struct {
     int width;
     int height;
     int damage;
+    int health;
+    int tookDamageFlag;
 } PLAYER;
 
 typedef struct {
@@ -81,3 +87,10 @@ typedef struct {
     int active;
     int erased;
 } RNA;
+
+typedef struct {
+    int row;
+    int col;
+    int active;
+    int erased;
+} HEART;

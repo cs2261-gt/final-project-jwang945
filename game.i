@@ -111,19 +111,22 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 16 "game.h"
+# 17 "game.h"
 int rand();
+void goToLose();
 void initGame();
 void initPlayer();
 void initEnemies();
 void initQuarantines();
 void initSyringes();
 void initRNAs();
+void initHearts();
 void updateGame();
 void updatePlayer();
 void updateEnemies();
 void updateSyringes();
 void updateRNAs();
+void updateHearts();
 void findSafeRowAndColForEnemy();
 void fireSyringe();
 
@@ -135,6 +138,8 @@ typedef struct {
     int width;
     int height;
     int damage;
+    int health;
+    int tookDamageFlag;
 } PLAYER;
 
 typedef struct {
@@ -180,6 +185,13 @@ typedef struct {
     int active;
     int erased;
 } RNA;
+
+typedef struct {
+    int row;
+    int col;
+    int active;
+    int erased;
+} HEART;
 # 3 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
@@ -196,6 +208,7 @@ ENEMY enemies[8];
 QUARANTINE quarantines[5];
 SYRINGE syringes[10];
 RNA rnas[16];
+HEART hearts[5];
 int enemiesOnScreen;
 int enemySpawnRate;
 
@@ -209,6 +222,7 @@ void initGame() {
     initQuarantines();
     initSyringes();
     initRNAs();
+    initHearts();
 
 
     waitForVBlank();
@@ -224,7 +238,8 @@ void initPlayer() {
     player.width = 32;
     player.height = 32;
     player.damage = 1;
-
+    player.health = 5;
+    player.tookDamageFlag = 0;
 
     shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
     shadowOAM[0].attr1 = player.col | (2<<14);
@@ -283,11 +298,26 @@ void initRNAs() {
         rnas[i].erased = 0;
     }
 }
+
+void initHearts() {
+    for (int i = 0; i < 5; i++) {
+        hearts[i].row = 2;
+        hearts[i].col = 3 + (10 * i);
+        hearts[i].active = 1;
+        hearts[i].erased = 0;
+
+        shadowOAM[i + 40].attr0 = hearts[i].row | (0<<13) | (0<<14);
+        shadowOAM[i + 40].attr1 = hearts[i].col | (0<<14);
+        shadowOAM[i + 40].attr2 = (((3 * 4)+2)*32+(0));
+    }
+}
+
 void updateGame() {
     updatePlayer();
     updateEnemies();
     updateSyringes();
     updateRNAs();
+    updateHearts();
 
 
     waitForVBlank();
@@ -295,6 +325,10 @@ void updateGame() {
 }
 
 void updatePlayer() {
+
+    if (player.health <= 0) {
+        goToLose();
+    }
 
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && player.row > 4) {
         player.row -= player.rdel;
@@ -311,11 +345,12 @@ void updatePlayer() {
     if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0))))) {
         fireSyringe();
     }
+    if (player.health > 0) {
 
-
-    shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
-    shadowOAM[0].attr1 = player.col | (2<<14);
-    shadowOAM[0].attr2 = ((0)*32+(0));
+        shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
+        shadowOAM[0].attr1 = player.col | (2<<14);
+        shadowOAM[0].attr2 = ((0)*32+(0));
+    }
 }
 
 void updateEnemies() {
@@ -364,9 +399,11 @@ void updateEnemies() {
                 shadowOAM[i + 1].attr0 = (2<<8);
             } else {
 
-                shadowOAM[i + 1].attr0 = enemies[i].row | (0<<13) | (0<<14);
-                shadowOAM[i + 1].attr1 = enemies[i].col | (2<<14);
-                shadowOAM[i + 1].attr2 = ((1 * 4)*32+(0));
+                if (player.health > 0) {
+                    shadowOAM[i + 1].attr0 = enemies[i].row | (0<<13) | (0<<14);
+                    shadowOAM[i + 1].attr1 = enemies[i].col | (2<<14);
+                    shadowOAM[i + 1].attr2 = ((1 * 4)*32+(0));
+                }
             }
         }
     }
@@ -398,9 +435,11 @@ void updateSyringes() {
                 shadowOAM[i + 14].attr0 = (2<<8);
             } else {
 
-                shadowOAM[i + 14].attr0 = syringes[i].row | (0<<13) | (0<<14);
-                shadowOAM[i + 14].attr1 = syringes[i].col | (0<<14);
-                shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+                if (player.health > 0) {
+                    shadowOAM[i + 14].attr0 = syringes[i].row | (0<<13) | (0<<14);
+                    shadowOAM[i + 14].attr1 = syringes[i].col | (0<<14);
+                    shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+                }
             }
         }
     }
@@ -422,14 +461,32 @@ void updateRNAs() {
                 rnas[i].active = 0;
                 rnas[i].erased = 1;
 
+                player.health--;
+                player.tookDamageFlag = 1;
             }
             if (rnas[i].erased) {
                 shadowOAM[i + 24].attr0 = (2<<8);
             } else {
 
-                shadowOAM[i + 24].attr0 = rnas[i].row | (0<<13) | (0<<14);
-                shadowOAM[i + 24].attr1 = rnas[i].col | (0<<14);
-                shadowOAM[i + 24].attr2 = (((3 * 4)+1)*32+(0));
+                if (player.health > 0) {
+                    shadowOAM[i + 24].attr0 = rnas[i].row | (0<<13) | (0<<14);
+                    shadowOAM[i + 24].attr1 = rnas[i].col | (0<<14);
+                    shadowOAM[i + 24].attr2 = (((3 * 4)+1)*32+(0));
+                }
+            }
+        }
+    }
+}
+
+void updateHearts() {
+    if (player.tookDamageFlag) {
+        player.tookDamageFlag = 0;
+
+        for (int i = 5 - 1; i >= 0; i--) {
+            if (hearts[i].active) {
+                hearts[i].active = 0;
+                shadowOAM[i + 40].attr0 = (2<<8);
+                break;
             }
         }
     }

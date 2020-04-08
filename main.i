@@ -369,7 +369,6 @@ void win() {
 }
 
 void goToLose() {
-
     hideSprites();
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
