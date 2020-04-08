@@ -11,7 +11,7 @@
 #define GRIDBOTTOMPIXEL 124
 #define GRIDLEFTPIXEL 4
 #define GRIDRIGHTPIXEL 84
-#define ENEMYFIRERATE 50
+#define ENEMYFIRERATE 200
 
 int rand();
 void initGame();

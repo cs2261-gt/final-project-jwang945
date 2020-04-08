@@ -231,6 +231,7 @@ void updateRNAs() {
             rnas[i].col -= rnas[i].cdel;
             if (rnas[i].col < 0) { //if it goes off screen, set it as inactive
                 rnas[i].active = 0;
+                rnas[i].erased = 1;
             }
             //check for collision with player
             if (collision(player.col, player.row, player.width, player.height, rnas[i].col, rnas[i].row, rnas[i].width, rnas[i].height)) {
@@ -239,6 +240,14 @@ void updateRNAs() {
                 rnas[i].active = 0;
                 rnas[i].erased = 1;
                 //damage the player here
+            }
+            if (rnas[i].erased) { //if syringe erased, hide the sprite
+                shadowOAM[i + 24].attr0 = ATTR0_HIDE;
+            } else {
+                //shadowOAM
+                shadowOAM[i + 24].attr0 = rnas[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                shadowOAM[i + 24].attr1 = rnas[i].col | ATTR1_TINY;
+                shadowOAM[i + 24].attr2 = ATTR2_TILEID(0, (3 * 4)+1);
             }
         }
     }

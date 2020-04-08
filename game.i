@@ -346,7 +346,7 @@ void updateEnemies() {
 
 
             enemies[i].RNATimer += 1;
-            if (enemies[i].RNATimer == 50) {
+            if (enemies[i].RNATimer == 200) {
                 enemies[i].RNATimer = 0;
 
                 for (int j = 0; j < 16; j++) {
@@ -418,6 +418,7 @@ void updateRNAs() {
             rnas[i].col -= rnas[i].cdel;
             if (rnas[i].col < 0) {
                 rnas[i].active = 0;
+                rnas[i].erased = 1;
             }
 
             if (collision(player.col, player.row, player.width, player.height, rnas[i].col, rnas[i].row, rnas[i].width, rnas[i].height)) {
@@ -426,6 +427,14 @@ void updateRNAs() {
                 rnas[i].active = 0;
                 rnas[i].erased = 1;
 
+            }
+            if (rnas[i].erased) {
+                shadowOAM[i + 24].attr0 = (2<<8);
+            } else {
+
+                shadowOAM[i + 24].attr0 = rnas[i].row | (0<<13) | (0<<14);
+                shadowOAM[i + 24].attr1 = rnas[i].col | (0<<14);
+                shadowOAM[i + 24].attr2 = (((3 * 4)+1)*32+(0));
             }
         }
     }
