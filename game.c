@@ -8,6 +8,8 @@ PLAYER player; //OAM[0] 0-15
 ENEMY enemies[MAXENEMIES]; //OAM[1] - OAM[8] 16-31
 QUARANTINE quarantines[MAXQUARANTINES]; // OAM[9] - OAM[13]
 SYRINGE syringes[MAXSYRINGES];// OAM[14] - OAM[23]
+int enemiesOnScreen;
+int enemySpawnRate;
 
 void initGame() {
     //load sprite palette
@@ -19,6 +21,8 @@ void initGame() {
 
     initPlayer();
     initEnemies();
+    enemiesOnScreen = 0;
+    enemySpawnRate = ENEMYSPAWNRATEBASE + (rand()%50);
     initQuarantines();
     initSyringes();
 
@@ -35,6 +39,7 @@ void initPlayer() {
     player.rdel = 40;
     player.width = 32;
     player.height = 32;
+    player.damage = 1;
 
     //shadowOAM player
     shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
@@ -51,14 +56,12 @@ void initEnemies() {
         enemies[i].rdel = 40;
         enemies[i].width = 32;
         enemies[i].height = 32;
+        enemies[i].health = 10;
         enemies[i].active = 0;
+        enemies[i].erased = 0;
+        enemies[i].movementTimer = 0;
+        enemies[i].spawnTimer = 0;
     }
-    //activate one
-    enemies[0].active = 1;
-    //shadowOAM that enemy
-    shadowOAM[1].attr0 = enemies[0].row | ATTR0_4BPP | ATTR0_SQUARE;
-    shadowOAM[1].attr1 = enemies[0].col | ATTR1_MEDIUM;
-    shadowOAM[1].attr2 = ATTR2_TILEID(0, 1 * 4);
 }
 
 void initQuarantines() {
@@ -84,8 +87,10 @@ void initSyringes() {
         syringes[i].erased = 0;
     }
 }
+
 void updateGame() {
     updatePlayer();
+    updateEnemies();
     updateSyringes();
 
     //copy to real OAM
@@ -95,16 +100,16 @@ void updateGame() {
 
 void updatePlayer() {
     //player movement logic
-    if (BUTTON_PRESSED(BUTTON_UP) && player.row > 4) {
+    if (BUTTON_PRESSED(BUTTON_UP) && player.row > GRIDTOPPIXEL) {
         player.row -= player.rdel;
     }
-    if (BUTTON_PRESSED(BUTTON_DOWN) && player.row < 124) {
+    if (BUTTON_PRESSED(BUTTON_DOWN) && player.row < GRIDBOTTOMPIXEL) {
         player.row += player.rdel;
     }
-    if (BUTTON_PRESSED(BUTTON_LEFT) && player.col > 4) {
+    if (BUTTON_PRESSED(BUTTON_LEFT) && player.col > GRIDLEFTPIXEL) {
         player.col -= player.cdel;
     }
-    if (BUTTON_PRESSED(BUTTON_RIGHT) && player.col < 84) {
+    if (BUTTON_PRESSED(BUTTON_RIGHT) && player.col < GRIDRIGHTPIXEL) {
         player.col += player.cdel;
     }
     if (BUTTON_PRESSED(BUTTON_A)) {
@@ -115,6 +120,44 @@ void updatePlayer() {
     shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
     shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
     shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
+}
+
+void updateEnemies() {
+    //enemy spawn logic
+    if (enemiesOnScreen < MAXENEMIES) {
+        for (int j = 0; j < MAXENEMIES; j++) {
+            if (!enemies[j].active) { //find first inactive enemy
+                enemies[j].spawnTimer += 1;
+                if (enemies[j].spawnTimer == enemySpawnRate) {
+                    enemies[j].spawnTimer = 0; //reset spawn timer
+                    enemies[j].active = 1; //set as active
+                    enemies[j].erased = 0;
+                    enemies[j].health = 10;
+                    findSafeRowAndColForEnemy(&enemies[j]);
+                    enemiesOnScreen++;
+                }
+                break;//leave for-loop after finding inactive enemy
+            }
+        }
+    }
+    for (int i = 0; i < MAXENEMIES; i++) {
+        if (enemies[i].active) {
+            //check if enemy has been killed
+            if (enemies[i].health <= 0) {
+                enemies[i].active = 0;
+                enemies[i].erased = 1;
+                enemiesOnScreen--;
+            }
+            if (enemies[i].erased) {
+                shadowOAM[i + 1].attr0 = ATTR0_HIDE;
+            } else {
+                //not erased, continue to draw
+                shadowOAM[i + 1].attr0 = enemies[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                shadowOAM[i + 1].attr1 = enemies[i].col | ATTR1_MEDIUM;
+                shadowOAM[i + 1].attr2 = ATTR2_TILEID(0, 1 * 4);
+            }
+        }
+    }
 }
 
 void updateSyringes() {
@@ -133,6 +176,9 @@ void updateSyringes() {
                         //hide syringe
                         syringes[i].active = 0;
                         syringes[i].erased = 1;
+                        //damage enemy
+                        enemies[j].health -= player.damage;
+                        //check if kill enemy in updateEnemies();
                     }
                 }
             }
@@ -147,6 +193,28 @@ void updateSyringes() {
         }
     }
 }
+void findSafeRowAndColForEnemy(ENEMY* e) {
+    int found = 0;
+    int col;
+    int row;
+    while (!found) { //while has not been 
+        found = 1; //set to 1 initially
+        col = ((rand()%2) * 40) + 164; //124 bc have to offset the grids on the player side
+        row = ((rand()%5) * 40) + 4; //4 bc is 32x32px but gridsquare is 40x40
+        for (int i = 0; i < MAXENEMIES; i++) {
+            if (enemies[i].active) {
+                //check all active enemies
+                if (enemies[i].col == col && enemies[i].row == row) {
+                    found = 0; //if any have the same row and col, then found = 0 bc need to keep searching
+                }
+            }
+        }
+    }
+    //after passing while loop, a row and col have been found, set to enemies
+    e -> row = row;
+    e -> col = col;
+}
+
 void fireSyringe() {
     for (int i = 0; i < MAXSYRINGES; i++) {
         if (syringes[i].active == 0) { //first inactive syringe

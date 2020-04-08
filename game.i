@@ -111,13 +111,8 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-
-
-
-
-
-
-
+# 14 "game.h"
+int rand();
 void initGame();
 void initPlayer();
 void initEnemies();
@@ -125,7 +120,9 @@ void initQuarantines();
 void initSyringes();
 void updateGame();
 void updatePlayer();
+void updateEnemies();
 void updateSyringes();
+void findSafeRowAndColForEnemy();
 void fireSyringe();
 
 typedef struct {
@@ -135,6 +132,7 @@ typedef struct {
     int rdel;
     int width;
     int height;
+    int damage;
 } PLAYER;
 
 typedef struct {
@@ -144,7 +142,11 @@ typedef struct {
     int rdel;
     int width;
     int height;
+    int health;
     int active;
+    int erased;
+    int movementTimer;
+    int spawnTimer;
 } ENEMY;
 
 typedef struct {
@@ -181,6 +183,8 @@ PLAYER player;
 ENEMY enemies[8];
 QUARANTINE quarantines[5];
 SYRINGE syringes[10];
+int enemiesOnScreen;
+int enemySpawnRate;
 
 void initGame() {
 
@@ -192,6 +196,8 @@ void initGame() {
 
     initPlayer();
     initEnemies();
+    enemiesOnScreen = 0;
+    enemySpawnRate = 100 + (rand()%50);
     initQuarantines();
     initSyringes();
 
@@ -208,6 +214,7 @@ void initPlayer() {
     player.rdel = 40;
     player.width = 32;
     player.height = 32;
+    player.damage = 1;
 
 
     shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
@@ -224,14 +231,12 @@ void initEnemies() {
         enemies[i].rdel = 40;
         enemies[i].width = 32;
         enemies[i].height = 32;
+        enemies[i].health = 10;
         enemies[i].active = 0;
+        enemies[i].erased = 0;
+        enemies[i].movementTimer = 0;
+        enemies[i].spawnTimer = 0;
     }
-
-    enemies[0].active = 1;
-
-    shadowOAM[1].attr0 = enemies[0].row | (0<<13) | (0<<14);
-    shadowOAM[1].attr1 = enemies[0].col | (2<<14);
-    shadowOAM[1].attr2 = ((1 * 4)*32+(0));
 }
 
 void initQuarantines() {
@@ -257,8 +262,10 @@ void initSyringes() {
         syringes[i].erased = 0;
     }
 }
+
 void updateGame() {
     updatePlayer();
+    updateEnemies();
     updateSyringes();
 
 
@@ -290,6 +297,44 @@ void updatePlayer() {
     shadowOAM[0].attr2 = ((0)*32+(0));
 }
 
+void updateEnemies() {
+
+    if (enemiesOnScreen < 8) {
+        for (int j = 0; j < 8; j++) {
+            if (!enemies[j].active) {
+                enemies[j].spawnTimer += 1;
+                if (enemies[j].spawnTimer == enemySpawnRate) {
+                    enemies[j].spawnTimer = 0;
+                    enemies[j].active = 1;
+                    enemies[j].erased = 0;
+                    enemies[j].health = 10;
+                    findSafeRowAndColForEnemy(&enemies[j]);
+                    enemiesOnScreen++;
+                }
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < 8; i++) {
+        if (enemies[i].active) {
+
+            if (enemies[i].health <= 0) {
+                enemies[i].active = 0;
+                enemies[i].erased = 1;
+                enemiesOnScreen--;
+            }
+            if (enemies[i].erased) {
+                shadowOAM[i + 1].attr0 = (2<<8);
+            } else {
+
+                shadowOAM[i + 1].attr0 = enemies[i].row | (0<<13) | (0<<14);
+                shadowOAM[i + 1].attr1 = enemies[i].col | (2<<14);
+                shadowOAM[i + 1].attr2 = ((1 * 4)*32+(0));
+            }
+        }
+    }
+}
+
 void updateSyringes() {
     for (int i = 0; i < 10; i++) {
         if (syringes[i].active) {
@@ -306,6 +351,9 @@ void updateSyringes() {
 
                         syringes[i].active = 0;
                         syringes[i].erased = 1;
+
+                        enemies[j].health -= player.damage;
+
                     }
                 }
             }
@@ -320,6 +368,28 @@ void updateSyringes() {
         }
     }
 }
+void findSafeRowAndColForEnemy(ENEMY* e) {
+    int found = 0;
+    int col;
+    int row;
+    while (!found) {
+        found = 1;
+        col = ((rand()%2) * 40) + 164;
+        row = ((rand()%5) * 40) + 4;
+        for (int i = 0; i < 8; i++) {
+            if (enemies[i].active) {
+
+                if (enemies[i].col == col && enemies[i].row == row) {
+                    found = 0;
+                }
+            }
+        }
+    }
+
+    e -> row = row;
+    e -> col = col;
+}
+
 void fireSyringe() {
     for (int i = 0; i < 10; i++) {
         if (syringes[i].active == 0) {
