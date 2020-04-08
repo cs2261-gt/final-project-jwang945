@@ -21,46 +21,74 @@ goToStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
-	mov	r4, #0
-	ldr	r1, .L4
-	ldr	r2, .L4+4
-	ldr	r3, .L4+8
-	str	r4, [r1]
-	str	r4, [r2]
-	mov	lr, pc
-	bx	r3
-	ldr	ip, .L4+12
+	mov	ip, #8
+	mov	r1, #102
+	push	{r4, r5, r6, lr}
+	mov	r5, #0
+	ldr	r2, .L4
+	ldr	r0, .L4+4
+	ldr	r4, .L4+8
+	str	ip, [r0]
+	str	r1, [r2]
 	mov	r3, #256
-	str	r4, [ip]
-	mov	r2, #83886080
-	ldr	r4, .L4+16
 	mov	r0, #3
-	ldr	r1, .L4+20
+	ldr	r2, .L4+12
+	ldr	r1, .L4+16
 	mov	lr, pc
 	bx	r4
-	mov	r3, #704
+	mov	r0, #3
+	ldr	r2, .L4+20
+	ldr	r1, .L4+24
+	mov	r3, #16384
+	mov	lr, pc
+	bx	r4
+	ldr	r3, .L4+28
+	mov	lr, pc
+	bx	r3
+	ldr	r1, .L4+32
+	ldr	r2, .L4+36
+	ldr	r3, .L4+40
+	str	r5, [r1]
+	str	r5, [r2]
+	mov	lr, pc
+	bx	r3
+	ldr	r0, .L4+44
+	mov	r3, #256
+	str	r5, [r0]
+	mov	r2, #83886080
+	mov	r0, #3
+	ldr	r1, .L4+48
+	mov	lr, pc
+	bx	r4
+	mov	r3, #560
 	mov	r2, #100663296
 	mov	r0, #3
-	ldr	r1, .L4+24
+	ldr	r1, .L4+52
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L4+28
-	ldr	r1, .L4+32
+	ldr	r2, .L4+56
+	ldr	r1, .L4+60
 	mov	lr, pc
 	bx	r4
-	pop	{r4, lr}
+	pop	{r4, r5, r6, lr}
 	bx	lr
 .L5:
 	.align	2
 .L4:
+	.word	cursorRow
+	.word	cursorCol
+	.word	DMANow
+	.word	83886592
+	.word	spritesheetPal
+	.word	100728832
+	.word	spritesheetTiles
+	.word	hideSprites
 	.word	startScreenIndex
 	.word	seed
 	.word	waitForVBlank
 	.word	state
-	.word	DMANow
 	.word	startscreenPal
 	.word	startscreenTiles
 	.word	100696064
@@ -204,75 +232,103 @@ start:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r3, .L35
+	mov	ip, #384
+	ldr	r1, .L35
+	ldr	r2, .L35+4
+	ldr	r3, [r1]
 	push	{r4, lr}
-	mov	lr, pc
-	bx	r3
-	ldr	r1, .L35+4
-	ldr	r3, .L35+8
-	ldr	r2, [r1]
-	ldrh	r3, [r3]
-	add	r2, r2, #1
-	tst	r3, #128
-	str	r2, [r1]
-	beq	.L18
-	ldr	r2, .L35+12
+	ldr	r0, .L35+8
+	ldr	lr, .L35+12
 	ldrh	r2, [r2]
+	add	r3, r3, #1
+	str	r3, [r1]
+	ldr	lr, [lr]
+	ldr	r1, [r0]
+	ldr	r3, .L35+16
 	tst	r2, #128
+	strh	r1, [r3]	@ movhi
+	strh	lr, [r3, #2]	@ movhi
+	strh	ip, [r3, #4]	@ movhi
+	beq	.L18
+	ldr	ip, .L35+20
+	ldrh	ip, [ip]
+	tst	ip, #128
 	beq	.L33
 .L18:
-	tst	r3, #64
+	tst	r2, #64
 	beq	.L19
-	ldr	r2, .L35+12
-	ldrh	r2, [r2]
-	ands	r2, r2, #64
+	ldr	r1, .L35+20
+	ldrh	r1, [r1]
+	ands	r1, r1, #64
 	beq	.L34
 .L19:
-	tst	r3, #8
-	beq	.L17
-	ldr	r3, .L35+12
-	ldrh	r3, [r3]
-	tst	r3, #8
-	bne	.L17
-	ldr	r3, .L35+16
-	ldr	r3, [r3]
-	cmp	r3, #0
+	tst	r2, #8
+	beq	.L20
+	ldr	r2, .L35+20
+	ldrh	r2, [r2]
+	tst	r2, #8
+	bne	.L20
+	mov	r1, #512
+	ldr	r2, .L35+24
+	ldr	r2, [r2]
+	cmp	r2, #0
+	strh	r1, [r3]	@ movhi
 	beq	.L21
-	cmp	r3, #1
+	cmp	r2, #1
 	beq	.L22
-.L17:
+.L20:
+	ldr	r3, .L35+28
+	mov	lr, pc
+	bx	r3
+	ldr	r4, .L35+32
+	mov	r3, #512
+	mov	r2, #117440512
+	mov	r0, #3
+	ldr	r1, .L35+36
+	mov	lr, pc
+	bx	r4
 	pop	{r4, lr}
 	bx	lr
 .L34:
-	ldr	r1, .L35+16
-	ldr	r0, [r1]
-	cmp	r0, #1
-	streq	r2, [r1]
+	ldr	ip, .L35+24
+	ldr	lr, [ip]
+	cmp	lr, #1
+	ldreq	lr, [r0]
+	subeq	lr, lr, #20
+	streq	r1, [ip]
+	streq	lr, [r0]
 	b	.L19
 .L33:
-	ldr	r2, .L35+16
-	ldr	r1, [r2]
-	cmp	r1, #0
-	moveq	r1, #1
-	streq	r1, [r2]
+	ldr	ip, .L35+24
+	ldr	lr, [ip]
+	cmp	lr, #0
+	moveq	lr, #1
+	addeq	r1, r1, #20
+	streq	r1, [r0]
+	streq	lr, [ip]
 	b	.L18
 .L22:
-	pop	{r4, lr}
-	b	goToInstructions
+	bl	goToInstructions
+	b	.L20
 .L21:
-	ldr	r3, .L35+20
+	ldr	r3, .L35+40
 	mov	lr, pc
 	bx	r3
-	pop	{r4, lr}
-	b	goToGame
+	bl	goToGame
+	b	.L20
 .L36:
 	.align	2
 .L35:
-	.word	waitForVBlank
 	.word	seed
 	.word	oldButtons
+	.word	cursorRow
+	.word	cursorCol
+	.word	shadowOAM+1016
 	.word	buttons
 	.word	startScreenIndex
+	.word	waitForVBlank
+	.word	DMANow
+	.word	shadowOAM
 	.word	initGame
 	.size	start, .-start
 	.align	2
@@ -430,18 +486,18 @@ win:
 	.word	buttons
 	.size	win, .-win
 	.align	2
-	.global	instruction
+	.global	instructions
 	.syntax unified
 	.arm
 	.fpu softvfp
-	.type	instruction, %function
-instruction:
+	.type	instructions, %function
+instructions:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	b	win
-	.size	instruction, .-instruction
+	.size	instructions, .-instructions
 	.align	2
 	.global	goToLose
 	.syntax unified
@@ -640,6 +696,8 @@ lose:
 	.comm	seed,4,4
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2
+	.comm	cursorCol,4,4
+	.comm	cursorRow,4,4
 	.comm	startScreenIndex,4,4
 	.comm	state,4,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

@@ -13,12 +13,7 @@ int enemiesOnScreen;
 int enemySpawnRate;
 
 void initGame() {
-    //load sprite palette
-    DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen/2);
-    //load sprite tiles
-    DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen/2);
-    //hide sprites
-    hideSprites();
+    //sprite pal and stuff are loaded in goToStart()
 
     initPlayer();
     initEnemies();

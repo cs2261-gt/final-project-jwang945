@@ -22,51 +22,35 @@ initGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, r7, r8, r9, r10, lr}
-	mov	r9, #0
-	mov	r3, #256
-	mov	r0, #3
-	ldr	r2, .L12
-	ldr	r1, .L12+4
-	ldr	r4, .L12+8
-	mov	lr, pc
-	bx	r4
-	mov	r0, #3
-	ldr	r2, .L12+12
-	ldr	r1, .L12+16
-	mov	r3, #16384
-	mov	lr, pc
-	bx	r4
-	ldr	r3, .L12+20
-	mov	lr, pc
-	bx	r3
+	mov	r8, #0
 	mov	r3, #40
-	mov	r8, #4
-	mov	r10, #1
+	mov	r7, #4
+	mov	r9, #1
 	mov	ip, #32
-	mov	r2, r9
-	mov	r7, #84
-	mov	r6, #164
+	mov	r2, r8
+	mov	r6, #84
+	mov	r5, #164
 	mov	lr, #10
-	ldr	r5, .L12+24
+	ldr	r4, .L12
 	mov	r0, r3
-	str	r3, [r5, #8]
-	str	r3, [r5, #12]
-	ldr	r3, .L12+28
-	str	r8, [r5]
-	strh	r8, [r3]	@ movhi
-	str	r8, [r5, #4]
-	sub	r8, r8, #32768
-	strh	r9, [r3, #4]	@ movhi
-	strh	r8, [r3, #2]	@ movhi
-	ldr	r3, .L12+32
-	str	r10, [r5, #24]
+	str	r3, [r4, #8]
+	str	r3, [r4, #12]
+	ldr	r3, .L12+4
+	str	r7, [r4]
+	strh	r7, [r3]	@ movhi
+	str	r7, [r4, #4]
+	sub	r7, r7, #32768
+	strh	r8, [r3, #4]	@ movhi
+	strh	r7, [r3, #2]	@ movhi
+	ldr	r3, .L12+8
+	str	r9, [r4, #24]
 	mov	r1, ip
-	str	ip, [r5, #16]
-	str	ip, [r5, #20]
+	str	ip, [r4, #16]
+	str	ip, [r4, #20]
 	add	ip, r3, #352
 .L2:
-	str	r7, [r3]
-	str	r6, [r3, #4]
+	str	r6, [r3]
+	str	r5, [r3, #4]
 	str	r0, [r3, #8]
 	str	r0, [r3, #12]
 	str	r1, [r3, #16]
@@ -79,23 +63,23 @@ initGame:
 	add	r3, r3, #44
 	cmp	r3, ip
 	bne	.L2
-	ldr	r1, .L12+36
-	ldr	r3, .L12+40
+	ldr	r1, .L12+12
+	ldr	r3, .L12+16
 	str	r2, [r1]
 	mov	lr, pc
 	bx	r3
 	mov	r2, #0
 	mov	ip, #40
 	mov	r1, #32
-	ldr	r3, .L12+44
-	smull	r6, lr, r3, r0
+	ldr	r3, .L12+20
+	smull	r5, lr, r3, r0
 	asr	r3, r0, #31
 	rsb	r3, r3, lr, asr #4
 	add	r3, r3, r3, lsl #2
 	add	r3, r3, r3, lsl #2
 	sub	r0, r0, r3, lsl #1
-	ldr	lr, .L12+48
-	ldr	r3, .L12+52
+	ldr	lr, .L12+24
+	ldr	r3, .L12+28
 	add	r0, r0, #100
 	str	r0, [lr]
 	add	r0, r3, #140
@@ -109,17 +93,17 @@ initGame:
 	add	r3, r3, #28
 	cmp	r3, r0
 	bne	.L3
-	mov	r6, #2
+	mov	r5, #2
 	mov	r1, #8
 	mov	r2, #0
-	ldr	r3, .L12+56
-	ldr	lr, [r5]
-	ldr	ip, [r5, #4]
+	ldr	r3, .L12+32
+	ldr	lr, [r4]
+	ldr	ip, [r4, #4]
 	add	r0, r3, #280
 .L4:
 	str	lr, [r3]
 	str	ip, [r3, #4]
-	str	r6, [r3, #8]
+	str	r5, [r3, #8]
 	str	r1, [r3, #12]
 	str	r1, [r3, #16]
 	str	r2, [r3, #20]
@@ -130,7 +114,7 @@ initGame:
 	mov	r2, #0
 	mov	ip, #1
 	mov	r1, #8
-	ldr	r3, .L12+60
+	ldr	r3, .L12+36
 	add	r0, r3, #448
 .L5:
 	str	r2, [r3]
@@ -142,13 +126,14 @@ initGame:
 	add	r3, r3, #28
 	cmp	r3, r0
 	bne	.L5
-	ldr	r3, .L12+64
+	ldr	r3, .L12+40
 	mov	lr, pc
 	bx	r3
+	ldr	r4, .L12+44
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L12+28
+	ldr	r1, .L12+4
 	mov	lr, pc
 	bx	r4
 	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
@@ -156,12 +141,6 @@ initGame:
 .L13:
 	.align	2
 .L12:
-	.word	83886592
-	.word	spritesheetPal
-	.word	DMANow
-	.word	100728832
-	.word	spritesheetTiles
-	.word	hideSprites
 	.word	player
 	.word	shadowOAM
 	.word	enemies
@@ -173,6 +152,7 @@ initGame:
 	.word	syringes
 	.word	rnas
 	.word	waitForVBlank
+	.word	DMANow
 	.size	initGame, .-initGame
 	.align	2
 	.global	initPlayer

@@ -4,6 +4,10 @@
 #include "losescreen.h"
 #include "winscreen.h"
 #include "instructionsscreen.h"
+#include "spritesheet.h"
+
+#define CURSORROWSPACE 20
+
 //prototypes
 void initialize();
 void game();
@@ -22,11 +26,15 @@ void goToWin();
 void win();
 void goToLose();
 void lose();
+void goToInstructions();
+void instructions();
 
 // States for state machine
 enum {START, INSTRUCTION, GAME, PAUSE, WIN, LOSE};
 int state;
 int startScreenIndex;
+int cursorRow;
+int cursorCol;
 // button Variables
 unsigned short buttons;
 unsigned short oldButtons;
@@ -44,7 +52,7 @@ int main() {
                 start();
                 break;
             case INSTRUCTION:
-                instruction();
+                instructions();
                 break;
             case GAME:
                 game();
@@ -72,6 +80,16 @@ void initialize() {
 }
 
 void goToStart() {
+    cursorRow = 102;
+    cursorCol = 8;
+
+    //load sprite palette
+    DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen/2);
+    //load sprite tiles
+    DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen/2);
+    //hide sprites
+    hideSprites();
+
     startScreenIndex = 0;
     seed = 0; //init seed
     waitForVBlank();
@@ -83,19 +101,24 @@ void goToStart() {
     //load map
     DMANow(3, startscreenMap, &SCREENBLOCK[16], startscreenMapLen/2);
 }
-
 void start() {
 
-    waitForVBlank();
+    shadowOAM[127].attr0 = cursorRow | ATTR0_4BPP | ATTR0_SQUARE;
+    shadowOAM[127].attr1 = cursorCol | ATTR1_TINY;
+    shadowOAM[127].attr2 = ATTR2_TILEID(0, 3 * 4);
+
     seed++; //increment seed depending on how long user stays on start screen
     if (BUTTON_PRESSED(BUTTON_DOWN) && startScreenIndex == 0) {
         startScreenIndex++;
+        cursorRow += CURSORROWSPACE;
     }
     if (BUTTON_PRESSED(BUTTON_UP) && startScreenIndex == 1) {
         startScreenIndex--;
+        cursorRow -= CURSORROWSPACE;
     }
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START)) {
+        shadowOAM[127].attr0 = ATTR0_HIDE; //hide the cursor
         switch(startScreenIndex) {
             case 0:
                 initGame();
@@ -106,7 +129,10 @@ void start() {
                 break;
         }
     }
+    waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 128 * 4);
 }
+
 void goToInstructions() {
     state = INSTRUCTION;
     //DMA palette
@@ -116,12 +142,13 @@ void goToInstructions() {
     //load map
     DMANow(3, instructionsscreenMap, &SCREENBLOCK[16], instructionsscreenMapLen/2);
 }
-void instruction() {
+void instructions() {
     waitForVBlank();
     if (BUTTON_PRESSED(BUTTON_START)) {
         goToStart();
     }
 }
+
 void goToGame() {
     srand(seed); //seed rand() once player hits start
     state = GAME;
@@ -133,7 +160,6 @@ void goToGame() {
     //load map
     DMANow(3, mainscreenMap, &SCREENBLOCK[16], mainscreenMapLen/2);
 }
-
 void game() {
     updateGame(); //go to game logic
     waitForVBlank();
@@ -152,7 +178,6 @@ void goToPause() {
     waitForVBlank();
     state = PAUSE;
 }
-
 void pause() {
     waitForVBlank();
     // State transitions
@@ -173,7 +198,6 @@ void goToWin() {
     //load map
     DMANow(3, winscreenMap, &SCREENBLOCK[16], winscreenMapLen/2);
 }
-
 void win() {
     waitForVBlank();
     // State transitions
@@ -192,7 +216,6 @@ void goToLose() {
     //load map
     DMANow(3, losescreenMap, &SCREENBLOCK[16], losescreenMapLen/2);
 }
-
 void lose() {
     waitForVBlank();
     // State transitions

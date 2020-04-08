@@ -112,7 +112,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 2 "main.c" 2
 # 1 "startscreen.h" 1
 # 22 "startscreen.h"
-extern const unsigned short startscreenTiles[704];
+extern const unsigned short startscreenTiles[560];
 
 
 extern const unsigned short startscreenMap[1024];
@@ -160,6 +160,16 @@ extern const unsigned short instructionsscreenMap[1024];
 
 extern const unsigned short instructionsscreenPal[256];
 # 7 "main.c" 2
+# 1 "spritesheet.h" 1
+# 21 "spritesheet.h"
+extern const unsigned short spritesheetTiles[16384];
+
+
+extern const unsigned short spritesheetPal[256];
+# 8 "main.c" 2
+
+
+
 
 void initialize();
 void game();
@@ -178,11 +188,15 @@ void goToWin();
 void win();
 void goToLose();
 void lose();
+void goToInstructions();
+void instructions();
 
 
 enum {START, INSTRUCTION, GAME, PAUSE, WIN, LOSE};
 int state;
 int startScreenIndex;
+int cursorRow;
+int cursorCol;
 
 unsigned short buttons;
 unsigned short oldButtons;
@@ -200,7 +214,7 @@ int main() {
                 start();
                 break;
             case INSTRUCTION:
-                instruction();
+                instructions();
                 break;
             case GAME:
                 game();
@@ -228,6 +242,16 @@ void initialize() {
 }
 
 void goToStart() {
+    cursorRow = 102;
+    cursorCol = 8;
+
+
+    DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512/2);
+
+    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 32768/2);
+
+    hideSprites();
+
     startScreenIndex = 0;
     seed = 0;
     waitForVBlank();
@@ -235,23 +259,28 @@ void goToStart() {
 
     DMANow(3, startscreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, startscreenTiles, &((charblock *)0x6000000)[0], 1408/2);
+    DMANow(3, startscreenTiles, &((charblock *)0x6000000)[0], 1120/2);
 
     DMANow(3, startscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
-
 void start() {
 
-    waitForVBlank();
+    shadowOAM[127].attr0 = cursorRow | (0<<13) | (0<<14);
+    shadowOAM[127].attr1 = cursorCol | (0<<14);
+    shadowOAM[127].attr2 = ((3 * 4)*32+(0));
+
     seed++;
     if ((!(~(oldButtons)&((1<<7))) && (~buttons & ((1<<7)))) && startScreenIndex == 0) {
         startScreenIndex++;
+        cursorRow += 20;
     }
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && startScreenIndex == 1) {
         startScreenIndex--;
+        cursorRow -= 20;
     }
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
+        shadowOAM[127].attr0 = (2<<8);
         switch(startScreenIndex) {
             case 0:
                 initGame();
@@ -262,7 +291,10 @@ void start() {
                 break;
         }
     }
+    waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
 }
+
 void goToInstructions() {
     state = INSTRUCTION;
 
@@ -272,12 +304,13 @@ void goToInstructions() {
 
     DMANow(3, instructionsscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
-void instruction() {
+void instructions() {
     waitForVBlank();
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
         goToStart();
     }
 }
+
 void goToGame() {
     srand(seed);
     state = GAME;
@@ -289,7 +322,6 @@ void goToGame() {
 
     DMANow(3, mainscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
-
 void game() {
     updateGame();
     waitForVBlank();
@@ -308,7 +340,6 @@ void goToPause() {
     waitForVBlank();
     state = PAUSE;
 }
-
 void pause() {
     waitForVBlank();
 
@@ -329,7 +360,6 @@ void goToWin() {
 
     DMANow(3, winscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
-
 void win() {
     waitForVBlank();
 
@@ -348,7 +378,6 @@ void goToLose() {
 
     DMANow(3, losescreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }
-
 void lose() {
     waitForVBlank();
 

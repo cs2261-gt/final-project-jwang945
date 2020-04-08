@@ -201,11 +201,6 @@ int enemySpawnRate;
 
 void initGame() {
 
-    DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512/2);
-
-    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 32768/2);
-
-    hideSprites();
 
     initPlayer();
     initEnemies();
