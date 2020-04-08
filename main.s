@@ -415,26 +415,35 @@ goToWin:
 	ldr	r3, .L57
 	mov	lr, pc
 	bx	r3
-	mov	lr, #4
-	ldr	ip, .L57+4
+	ldr	r3, .L57+4
+	mov	lr, pc
+	bx	r3
 	ldr	r4, .L57+8
-	mov	r3, #256
-	mov	r2, #83886080
+	mov	r3, #512
+	mov	r2, #117440512
 	mov	r0, #3
 	ldr	r1, .L57+12
-	str	lr, [ip]
+	mov	lr, pc
+	bx	r4
+	mov	ip, #4
+	ldr	r0, .L57+16
+	mov	r3, #256
+	str	ip, [r0]
+	mov	r2, #83886080
+	mov	r0, #3
+	ldr	r1, .L57+20
 	mov	lr, pc
 	bx	r4
 	mov	r3, #320
 	mov	r2, #100663296
 	mov	r0, #3
-	ldr	r1, .L57+16
+	ldr	r1, .L57+24
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L57+20
-	ldr	r1, .L57+24
+	ldr	r2, .L57+28
+	ldr	r1, .L57+32
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
@@ -442,9 +451,11 @@ goToWin:
 .L58:
 	.align	2
 .L57:
+	.word	hideSprites
 	.word	waitForVBlank
-	.word	state
 	.word	DMANow
+	.word	shadowOAM
+	.word	state
 	.word	winscreenPal
 	.word	winscreenTiles
 	.word	100696064
@@ -512,26 +523,35 @@ goToLose:
 	ldr	r3, .L71
 	mov	lr, pc
 	bx	r3
-	mov	lr, #5
-	ldr	ip, .L71+4
+	ldr	r3, .L71+4
+	mov	lr, pc
+	bx	r3
 	ldr	r4, .L71+8
-	mov	r3, #256
-	mov	r2, #83886080
+	mov	r3, #512
+	mov	r2, #117440512
 	mov	r0, #3
 	ldr	r1, .L71+12
-	str	lr, [ip]
+	mov	lr, pc
+	bx	r4
+	mov	ip, #5
+	ldr	r0, .L71+16
+	mov	r3, #256
+	str	ip, [r0]
+	mov	r2, #83886080
+	mov	r0, #3
+	ldr	r1, .L71+20
 	mov	lr, pc
 	bx	r4
 	mov	r3, #112
 	mov	r2, #100663296
 	mov	r0, #3
-	ldr	r1, .L71+16
+	ldr	r1, .L71+24
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L71+20
-	ldr	r1, .L71+24
+	ldr	r2, .L71+28
+	ldr	r1, .L71+32
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
@@ -539,9 +559,11 @@ goToLose:
 .L72:
 	.align	2
 .L71:
+	.word	hideSprites
 	.word	waitForVBlank
-	.word	state
 	.word	DMANow
+	.word	shadowOAM
+	.word	state
 	.word	losescreenPal
 	.word	losescreenTiles
 	.word	100696064

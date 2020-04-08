@@ -188,8 +188,9 @@ void pause() {
 }
 
 void goToWin() {
-    
+    hideSprites();
     waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 128 * 4);
     state = WIN;
     //DMA palette
     DMANow(3, winscreenPal, PALETTE, 256);
@@ -207,7 +208,9 @@ void win() {
 
 void goToLose() {
     
+    hideSprites();
     waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 128 * 4);
     state = LOSE;
     //DMA palette
     DMANow(3, losescreenPal, PALETTE, 256);

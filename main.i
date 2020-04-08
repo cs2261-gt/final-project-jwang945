@@ -350,8 +350,9 @@ void pause() {
 }
 
 void goToWin() {
-
+    hideSprites();
     waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
     state = WIN;
 
     DMANow(3, winscreenPal, ((unsigned short *)0x5000000), 256);
@@ -369,7 +370,9 @@ void win() {
 
 void goToLose() {
 
+    hideSprites();
     waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
     state = LOSE;
 
     DMANow(3, losescreenPal, ((unsigned short *)0x5000000), 256);
