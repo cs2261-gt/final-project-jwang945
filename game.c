@@ -13,6 +13,8 @@ HEART hearts[MAXHEARTS];// OAM[40] - OAM[45]
 int enemiesOnScreen;
 int enemySpawnRate;
 int enemiesKilled;
+int quarantinesOnScreen;
+int quarantineSpawnRate;
 
 void initGame() {
     //sprite pal and stuff are loaded in goToStart()
@@ -23,6 +25,8 @@ void initGame() {
     enemySpawnRate = ENEMYSPAWNRATEBASE + (rand()%50);
     enemiesKilled = 0;
     initQuarantines();
+    quarantinesOnScreen = 0;
+    quarantineSpawnRate = QUARANTINESPAWNRATEBASE + (rand()%100);
     initSyringes();
     initRNAs();
     initHearts();
@@ -75,6 +79,8 @@ void initQuarantines() {
         quarantines[i].width = 32;
         quarantines[i].height = 32;
         quarantines[i].active = 0;
+        quarantines[i].erased = 0;
+        quarantines[i].spawnTimer = 0;
     }
 }
 
@@ -118,6 +124,7 @@ void initHearts() {
 void updateGame() {
     updatePlayer();
     updateEnemies();
+    updateQuarantines();
     updateSyringes();
     updateRNAs();
     updateHearts();
@@ -214,6 +221,33 @@ void updateEnemies() {
                     shadowOAM[i + 1].attr2 = ATTR2_TILEID(0, 1 * 4);
                 }
             }
+        }
+    }
+}
+
+void updateQuarantines() {
+    //quarantine spawn logic
+    if (quarantinesOnScreen < MAXQUARANTINES) {
+        for (int i = 0; i < MAXQUARANTINES; i++) {
+            if (!quarantines[i].active) { //find first inactive one
+                quarantines[i].spawnTimer++;
+                if (quarantines[i].spawnTimer == quarantineSpawnRate) { //time to spawn this quarantine
+                    quarantines[i].spawnTimer = 0;
+                    quarantines[i].active = 1;
+                    quarantines[i].erased = 0;
+                    findRowAndColForQuarantine(&quarantines[i]);
+                    quarantinesOnScreen++;
+                }
+                break;
+            }
+        }
+    }
+    //draw quarantines
+    for (int i = 0; i < MAXQUARANTINES; i++) {
+        if (quarantines[i].active) {
+            shadowOAM[i + 9].attr0 = quarantines[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+            shadowOAM[i + 9].attr1 = quarantines[i].col | ATTR1_MEDIUM;
+            shadowOAM[i + 9].attr2 = ATTR2_TILEID(0, 2 * 4);
         }
     }
 }
@@ -323,6 +357,42 @@ void findSafeRowAndColForEnemy(ENEMY* e) {
     e -> col = col;
 }
 
+void findRowAndColForQuarantine(QUARANTINE* q) {
+    int spawnUnderPlayer = rand()%2; // 50% chance to spawn directly under player
+    int col;
+    int row;
+    int found = 0;
+    
+    while (!found) {
+        found = 1;
+        col = ((rand()%3)*40) + 4;
+        row = ((rand()%5)*40) + 4;
+        if (spawnUnderPlayer) {
+            for (int i = 0; i < MAXQUARANTINES; i++) {
+                if (quarantines[i].active) {
+                    if (quarantines[i].col == player.col && quarantines[i].row == player.row) {
+                        //means there is already a quarantine under the player, need to spawn a new one somewhere else
+                        found = 0;
+                        spawnUnderPlayer = 0;
+                    }
+                }
+            }
+            col = player.col;
+            row = player.row;
+        } else {
+            //do not spawn it under the player, spawn it randomly somewhere
+            for (int i = 0; i < MAXQUARANTINES; i++) {
+                if (quarantines[i].active) {
+                    if (quarantines[i].col == col && quarantines[i].row == row) {
+                        found = 0; //another quarantine is already there, have to keep looking
+                    }
+                }
+            }
+        }
+    }
+    q -> row = row;
+    q -> col = col;
+}
 void fireSyringe() {
     for (int i = 0; i < MAXSYRINGES; i++) {
         if (syringes[i].active == 0) { //first inactive syringe

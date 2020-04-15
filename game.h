@@ -4,6 +4,7 @@
 #define MAXENEMIES 8
 #define ENEMYSPAWNRATEBASE 200
 #define MAXQUARANTINES 5
+#define QUARANTINESPAWNRATEBASE 220
 #define MAXSYRINGES 10
 #define MAXRNAS 16
 #define MAXHEARTS 5
@@ -13,6 +14,7 @@
 #define GRIDRIGHTPIXEL 84
 #define ENEMYFIRERATE 200
 #define WINCONDITION 10
+
 int rand();
 void goToLose();
 void goToWin();
@@ -26,10 +28,12 @@ void initHearts();
 void updateGame();
 void updatePlayer();
 void updateEnemies();
+void updateQuarantines();
 void updateSyringes();
 void updateRNAs();
 void updateHearts();
 void findSafeRowAndColForEnemy();
+void findRowAndColForQuarantine();
 void fireSyringe();
 
 typedef struct {
@@ -66,6 +70,8 @@ typedef struct {
     int width;
     int height;
     int active;
+    int erased;
+    int spawnTimer;
 } QUARANTINE;
 
 typedef struct {

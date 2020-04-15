@@ -111,7 +111,7 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 16 "game.h"
+# 18 "game.h"
 int rand();
 void goToLose();
 void goToWin();
@@ -125,10 +125,12 @@ void initHearts();
 void updateGame();
 void updatePlayer();
 void updateEnemies();
+void updateQuarantines();
 void updateSyringes();
 void updateRNAs();
 void updateHearts();
 void findSafeRowAndColForEnemy();
+void findRowAndColForQuarantine();
 void fireSyringe();
 
 typedef struct {
@@ -165,6 +167,8 @@ typedef struct {
     int width;
     int height;
     int active;
+    int erased;
+    int spawnTimer;
 } QUARANTINE;
 
 typedef struct {
@@ -213,6 +217,8 @@ HEART hearts[5];
 int enemiesOnScreen;
 int enemySpawnRate;
 int enemiesKilled;
+int quarantinesOnScreen;
+int quarantineSpawnRate;
 
 void initGame() {
 
@@ -223,6 +229,8 @@ void initGame() {
     enemySpawnRate = 200 + (rand()%50);
     enemiesKilled = 0;
     initQuarantines();
+    quarantinesOnScreen = 0;
+    quarantineSpawnRate = 150 + (rand()%100);
     initSyringes();
     initRNAs();
     initHearts();
@@ -275,6 +283,8 @@ void initQuarantines() {
         quarantines[i].width = 32;
         quarantines[i].height = 32;
         quarantines[i].active = 0;
+        quarantines[i].erased = 0;
+        quarantines[i].spawnTimer = 0;
     }
 }
 
@@ -318,6 +328,7 @@ void initHearts() {
 void updateGame() {
     updatePlayer();
     updateEnemies();
+    updateQuarantines();
     updateSyringes();
     updateRNAs();
     updateHearts();
@@ -414,6 +425,33 @@ void updateEnemies() {
                     shadowOAM[i + 1].attr2 = ((1 * 4)*32+(0));
                 }
             }
+        }
+    }
+}
+
+void updateQuarantines() {
+
+    if (quarantinesOnScreen < 5) {
+        for (int i = 0; i < 5; i++) {
+            if (!quarantines[i].active) {
+                quarantines[i].spawnTimer++;
+                if (quarantines[i].spawnTimer == quarantineSpawnRate) {
+                    quarantines[i].spawnTimer = 0;
+                    quarantines[i].active = 1;
+                    quarantines[i].erased = 0;
+                    findRowAndColForQuarantine(&quarantines[i]);
+                    quarantinesOnScreen++;
+                }
+                break;
+            }
+        }
+    }
+
+    for (int i = 0; i < 5; i++) {
+        if (quarantines[i].active) {
+            shadowOAM[i + 9].attr0 = quarantines[i].row | (0<<13) | (0<<14);
+            shadowOAM[i + 9].attr1 = quarantines[i].col | (2<<14);
+            shadowOAM[i + 9].attr2 = ((2 * 4)*32+(0));
         }
     }
 }
@@ -523,6 +561,42 @@ void findSafeRowAndColForEnemy(ENEMY* e) {
     e -> col = col;
 }
 
+void findRowAndColForQuarantine(QUARANTINE* q) {
+    int spawnUnderPlayer = rand()%2;
+    int col;
+    int row;
+    int found = 0;
+
+    while (!found) {
+        found = 1;
+        col = ((rand()%3)*40) + 4;
+        row = ((rand()%5)*40) + 4;
+        if (spawnUnderPlayer) {
+            for (int i = 0; i < 5; i++) {
+                if (quarantines[i].active) {
+                    if (quarantines[i].col == player.col && quarantines[i].row == player.row) {
+
+                        found = 0;
+                        spawnUnderPlayer = 0;
+                    }
+                }
+            }
+            col = player.col;
+            row = player.row;
+        } else {
+
+            for (int i = 0; i < 5; i++) {
+                if (quarantines[i].active) {
+                    if (quarantines[i].col == col && quarantines[i].row == row) {
+                        found = 0;
+                    }
+                }
+            }
+        }
+    }
+    q -> row = row;
+    q -> col = col;
+}
 void fireSyringe() {
     for (int i = 0; i < 10; i++) {
         if (syringes[i].active == 0) {
