@@ -1,6 +1,7 @@
 /*
 CORONA KING
 Control the player on the left side of the grid and press A to shoot. Kill 10 enemies to win!
+For M03, the parallax background requirement is in the win and lose screen. Get to lose screen by pressing B for now or lose all hearts.
 */
 #include "myLib.h"
 #include "startscreen.h"
@@ -46,8 +47,8 @@ unsigned short buttons;
 unsigned short oldButtons;
 
 //variables for background
-unsigned short hOff;
-unsigned short vOff;
+int hOff;
+int vOff;
 unsigned short hOffCounter;
 unsigned short vOffCounter;
 
@@ -179,8 +180,6 @@ void game() {
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START))
         goToPause();
-    //else if (BUTTON_PRESSED(BUTTON_A))
-        //goToWin();
     else if (BUTTON_PRESSED(BUTTON_B))
         goToLose();
 }
@@ -210,9 +209,29 @@ void goToWin() {
     DMANow(3, winscreenTiles, &CHARBLOCK[0], winscreenTilesLen/2);
     //load map
     DMANow(3, winscreenMap, &SCREENBLOCK[16], winscreenMapLen/2);
+    //enable second background
+    REG_DISPCTL = REG_DISPCTL | BG1_ENABLE;
+    REG_BG1CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(17) | BG_SIZE_SMALL | BG_4BPP;
+    //DMANow(3, retrobackgroundPal, PALETTE, 256);
+    DMANow(3, retrobackgroundTiles, &CHARBLOCK[1], retrobackgroundTilesLen/2);
+    DMANow(3, retrobackgroundMap, &SCREENBLOCK[17], retrobackgroundMapLen/2);
+    hOff = 0;
+    vOff = 0;
+    vOffCounter = 0;
+    hOffCounter = 0;
 }
 void win() {
+    vOffCounter++;
+    hOffCounter++;
+    if (vOffCounter % 10 == 0) {
+        vOff--;
+    }
+    if (hOffCounter % 5 == 0) {
+        hOff++;
+    }
     waitForVBlank();
+    REG_BG0VOFF = vOff;
+    REG_BG1HOFF = hOff;
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START))
         goToStart();

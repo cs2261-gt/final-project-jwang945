@@ -146,7 +146,7 @@ extern const unsigned short losescreenPal[256];
 # 9 "main.c" 2
 # 1 "winscreen.h" 1
 # 22 "winscreen.h"
-extern const unsigned short winscreenTiles[320];
+extern const unsigned short winscreenTiles[528];
 
 
 extern const unsigned short winscreenMap[1024];
@@ -217,8 +217,8 @@ unsigned short buttons;
 unsigned short oldButtons;
 
 
-unsigned short hOff;
-unsigned short vOff;
+int hOff;
+int vOff;
 unsigned short hOffCounter;
 unsigned short vOffCounter;
 
@@ -350,8 +350,6 @@ void game() {
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
         goToPause();
-
-
     else if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1)))))
         goToLose();
 }
@@ -378,12 +376,32 @@ void goToWin() {
 
     DMANow(3, winscreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, winscreenTiles, &((charblock *)0x6000000)[0], 640/2);
+    DMANow(3, winscreenTiles, &((charblock *)0x6000000)[0], 1056/2);
 
     DMANow(3, winscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
+
+    (*(unsigned short *)0x4000000) = (*(unsigned short *)0x4000000) | (1<<9);
+    (*(volatile unsigned short*)0x400000A) = ((1)<<2) | ((17)<<8) | (0<<14) | (0<<7);
+
+    DMANow(3, retrobackgroundTiles, &((charblock *)0x6000000)[1], 16256/2);
+    DMANow(3, retrobackgroundMap, &((screenblock *)0x6000000)[17], 2048/2);
+    hOff = 0;
+    vOff = 0;
+    vOffCounter = 0;
+    hOffCounter = 0;
 }
 void win() {
+    vOffCounter++;
+    hOffCounter++;
+    if (vOffCounter % 10 == 0) {
+        vOff--;
+    }
+    if (hOffCounter % 5 == 0) {
+        hOff++;
+    }
     waitForVBlank();
+    (*(volatile unsigned short *)0x04000012) = vOff;
+    (*(volatile unsigned short *)0x04000014) = hOff;
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
         goToStart();
