@@ -160,7 +160,7 @@ initGame:
 	add	r3, r3, r3, lsl r4
 	ldr	ip, .L27+40
 	sub	r0, r0, r3, lsl r4
-	add	r0, r0, #150
+	add	r0, r0, #220
 	ldr	r3, .L27+44
 	str	r0, [ip]
 	ldr	lr, [r5]

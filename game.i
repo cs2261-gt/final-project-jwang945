@@ -230,7 +230,7 @@ void initGame() {
     enemiesKilled = 0;
     initQuarantines();
     quarantinesOnScreen = 0;
-    quarantineSpawnRate = 150 + (rand()%100);
+    quarantineSpawnRate = 220 + (rand()%100);
     initSyringes();
     initRNAs();
     initHearts();
