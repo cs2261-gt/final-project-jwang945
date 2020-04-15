@@ -136,7 +136,7 @@ extern const unsigned short mainscreenPal[256];
 # 8 "main.c" 2
 # 1 "losescreen.h" 1
 # 22 "losescreen.h"
-extern const unsigned short losescreenTiles[112];
+extern const unsigned short losescreenTiles[640];
 
 
 extern const unsigned short losescreenMap[1024];
@@ -171,6 +171,16 @@ extern const unsigned short spritesheetTiles[16384];
 
 extern const unsigned short spritesheetPal[256];
 # 12 "main.c" 2
+# 1 "retrobackground.h" 1
+# 22 "retrobackground.h"
+extern const unsigned short retrobackgroundTiles[8128];
+
+
+extern const unsigned short retrobackgroundMap[1024];
+
+
+extern const unsigned short retrobackgroundPal[256];
+# 13 "main.c" 2
 
 
 
@@ -202,8 +212,15 @@ int startScreenIndex;
 int cursorRow;
 int cursorCol;
 
+
 unsigned short buttons;
 unsigned short oldButtons;
+
+
+unsigned short hOff;
+unsigned short vOff;
+unsigned short hOffCounter;
+unsigned short vOffCounter;
 
 int seed;
 
@@ -380,13 +397,36 @@ void goToLose() {
 
     DMANow(3, losescreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, losescreenTiles, &((charblock *)0x6000000)[0], 224/2);
+    DMANow(3, losescreenTiles, &((charblock *)0x6000000)[0], 1280/2);
 
     DMANow(3, losescreenMap, &((screenblock *)0x6000000)[16], 2048/2);
+
+
+    (*(unsigned short *)0x4000000) = (*(unsigned short *)0x4000000) | (1<<9);
+    (*(volatile unsigned short*)0x400000A) = ((1)<<2) | ((17)<<8) | (0<<14) | (0<<7);
+
+    DMANow(3, retrobackgroundTiles, &((charblock *)0x6000000)[1], 16256/2);
+    DMANow(3, retrobackgroundMap, &((screenblock *)0x6000000)[17], 2048/2);
+
+    hOff = 0;
+    vOff = 0;
+    vOffCounter = 0;
+    hOffCounter = 0;
 }
 void lose() {
+    vOffCounter++;
+    hOffCounter++;
+    if (vOffCounter % 10 == 0) {
+        vOff--;
+    }
+    if (hOffCounter % 5 == 0) {
+        hOff++;
+    }
     waitForVBlank();
+    (*(volatile unsigned short *)0x04000012) = vOff;
+    (*(volatile unsigned short *)0x04000014) = hOff;
 
-    if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
+    if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
         goToStart();
+    }
 }

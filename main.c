@@ -9,6 +9,7 @@ Control the player on the left side of the grid and press A to shoot. Kill 10 en
 #include "winscreen.h"
 #include "instructionsscreen.h"
 #include "spritesheet.h"
+#include "retrobackground.h"
 
 #define CURSORROWSPACE 20
 
@@ -39,9 +40,16 @@ int state;
 int startScreenIndex;
 int cursorRow;
 int cursorCol;
+
 // button Variables
 unsigned short buttons;
 unsigned short oldButtons;
+
+//variables for background
+unsigned short hOff;
+unsigned short vOff;
+unsigned short hOffCounter;
+unsigned short vOffCounter;
 
 int seed; //random seed
 
@@ -221,10 +229,33 @@ void goToLose() {
     DMANow(3, losescreenTiles, &CHARBLOCK[0], losescreenTilesLen/2);
     //load map
     DMANow(3, losescreenMap, &SCREENBLOCK[16], losescreenMapLen/2);
+
+    //enable second background
+    REG_DISPCTL = REG_DISPCTL | BG1_ENABLE;
+    REG_BG1CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(17) | BG_SIZE_SMALL | BG_4BPP;
+    //DMANow(3, retrobackgroundPal, PALETTE, 256);
+    DMANow(3, retrobackgroundTiles, &CHARBLOCK[1], retrobackgroundTilesLen/2);
+    DMANow(3, retrobackgroundMap, &SCREENBLOCK[17], retrobackgroundMapLen/2);
+
+    hOff = 0;
+    vOff = 0;
+    vOffCounter = 0;
+    hOffCounter = 0;
 }
 void lose() {
+    vOffCounter++;
+    hOffCounter++;
+    if (vOffCounter % 10 == 0) {
+        vOff--; //this is to slow down vOff change
+    }
+    if (hOffCounter % 5 == 0) {
+        hOff++;
+    }
     waitForVBlank();
+    REG_BG0VOFF = vOff;
+    REG_BG1HOFF = hOff;
     // State transitions
-    if (BUTTON_PRESSED(BUTTON_START))
+    if (BUTTON_PRESSED(BUTTON_START)) {
         goToStart();
+    }
 }

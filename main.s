@@ -542,7 +542,7 @@ goToLose:
 	ldr	r1, .L71+20
 	mov	lr, pc
 	bx	r4
-	mov	r3, #112
+	mov	r3, #640
 	mov	r2, #100663296
 	mov	r0, #3
 	ldr	r1, .L71+24
@@ -554,6 +554,33 @@ goToLose:
 	ldr	r1, .L71+32
 	mov	lr, pc
 	bx	r4
+	mov	r3, #67108864
+	ldrh	r2, [r3]
+	ldr	r1, .L71+36
+	orr	r2, r2, #512
+	strh	r2, [r3]	@ movhi
+	strh	r1, [r3, #10]	@ movhi
+	mov	r0, #3
+	mov	r3, #8128
+	ldr	r2, .L71+40
+	ldr	r1, .L71+44
+	mov	lr, pc
+	bx	r4
+	mov	r3, #1024
+	mov	r0, #3
+	ldr	r2, .L71+48
+	ldr	r1, .L71+52
+	mov	lr, pc
+	bx	r4
+	mov	r3, #0
+	ldr	ip, .L71+56
+	ldr	r0, .L71+60
+	ldr	r1, .L71+64
+	ldr	r2, .L71+68
+	strh	r3, [ip]	@ movhi
+	strh	r3, [r0]	@ movhi
+	strh	r3, [r1]	@ movhi
+	strh	r3, [r2]	@ movhi
 	pop	{r4, lr}
 	bx	lr
 .L72:
@@ -568,6 +595,15 @@ goToLose:
 	.word	losescreenTiles
 	.word	100696064
 	.word	losescreenMap
+	.word	4356
+	.word	100679680
+	.word	retrobackgroundTiles
+	.word	100698112
+	.word	retrobackgroundMap
+	.word	hOff
+	.word	vOff
+	.word	vOffCounter
+	.word	hOffCounter
 	.size	goToLose, .-goToLose
 	.align	2
 	.global	game
@@ -624,6 +660,91 @@ game:
 	.word	buttons
 	.word	state
 	.size	game, .-game
+	.align	2
+	.global	lose
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	lose, %function
+lose:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	ldr	r0, .L100
+	ldrh	r1, [r0]
+	add	r1, r1, #1
+	lsl	r1, r1, #16
+	lsr	r1, r1, #16
+	add	r2, r1, r1, lsl #1
+	add	r2, r2, r2, lsl #4
+	add	r2, r2, r2, lsl #8
+	add	r2, r1, r2, lsl #2
+	push	{r4, r5, r6, lr}
+	lsl	r3, r2, #15
+	lsl	lr, r2, #16
+	ldr	ip, .L100+4
+	orr	r3, r3, lr, lsr #17
+	lsl	r3, r3, #16
+	ldr	lr, .L100+8
+	lsr	r3, r3, #16
+	ldrh	r2, [ip]
+	ldr	r5, .L100+12
+	cmp	r3, lr
+	ldrhls	r3, [r5]
+	add	r2, r2, #1
+	lsl	r2, r2, #16
+	lsr	r2, r2, #16
+	subls	r3, r3, #1
+	strhls	r3, [r5]	@ movhi
+	add	r3, r2, r2, lsl #1
+	add	r3, r3, r3, lsl #4
+	add	r3, r3, r3, lsl #8
+	strh	r2, [ip]	@ movhi
+	add	r2, r2, r3, lsl #2
+	lsl	r2, r2, #16
+	ldr	r3, .L100+16
+	ldr	r4, .L100+20
+	lsr	r2, r2, #16
+	cmp	r2, r3
+	ldrhls	r3, [r4]
+	addls	r3, r3, #1
+	strhls	r3, [r4]	@ movhi
+	ldr	r3, .L100+24
+	strh	r1, [r0]	@ movhi
+	mov	lr, pc
+	bx	r3
+	mov	r3, #67108864
+	ldrh	r2, [r5]
+	strh	r2, [r3, #18]	@ movhi
+	ldrh	r1, [r4]
+	ldr	r2, .L100+28
+	strh	r1, [r3, #20]	@ movhi
+	ldrh	r3, [r2]
+	tst	r3, #8
+	beq	.L87
+	ldr	r3, .L100+32
+	ldrh	r3, [r3]
+	tst	r3, #8
+	beq	.L99
+.L87:
+	pop	{r4, r5, r6, lr}
+	bx	lr
+.L99:
+	pop	{r4, r5, r6, lr}
+	b	goToStart
+.L101:
+	.align	2
+.L100:
+	.word	vOffCounter
+	.word	hOffCounter
+	.word	6553
+	.word	vOff
+	.word	13107
+	.word	hOff
+	.word	waitForVBlank
+	.word	oldButtons
+	.word	buttons
+	.size	lose, .-lose
 	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
@@ -638,59 +759,64 @@ main:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	mov	r3, #67108864
 	mov	r2, #4096
-	mov	r1, #4352
+	mov	r0, #4352
 	push	{r4, r7, fp, lr}
 	strh	r2, [r3, #8]	@ movhi
-	ldr	r4, .L98
-	ldr	fp, .L98+4
+	ldr	r4, .L114
+	ldr	r8, .L114+4
 	ldrh	r2, [r4, #48]
-	strh	r1, [r3]	@ movhi
-	ldr	r3, .L98+8
-	strh	r2, [fp]	@ movhi
+	strh	r0, [r3]	@ movhi
+	ldr	r3, .L114+8
+	strh	r2, [r8]	@ movhi
 	mov	lr, pc
 	bx	r3
-	ldr	r6, .L98+12
-	ldr	r5, .L98+16
-	ldr	r10, .L98+20
-	ldr	r7, .L98+24
-	ldr	r9, .L98+28
-	ldr	r8, .L98+32
-.L88:
+	ldr	r6, .L114+12
+	ldr	r5, .L114+16
+	ldr	fp, .L114+20
+	ldr	r7, .L114+24
+	ldr	r10, .L114+28
+	ldr	r9, .L114+32
+.L103:
 	ldr	r2, [r6]
-	ldrh	r3, [fp]
-.L89:
+	ldrh	r3, [r8]
+.L104:
 	strh	r3, [r5]	@ movhi
 	ldrh	r3, [r4, #48]
-	strh	r3, [fp]	@ movhi
+	strh	r3, [r8]	@ movhi
 	cmp	r2, #5
 	ldrls	pc, [pc, r2, asl #2]
-	b	.L89
-.L91:
-	.word	.L94
-	.word	.L90
-	.word	.L93
-	.word	.L92
-	.word	.L90
-	.word	.L90
-.L90:
+	b	.L104
+.L106:
+	.word	.L110
+	.word	.L107
+	.word	.L109
+	.word	.L108
+	.word	.L107
+	.word	.L105
+.L107:
 	mov	lr, pc
 	bx	r7
-	b	.L88
-.L94:
+	b	.L103
+.L110:
 	mov	lr, pc
-	bx	r10
-	b	.L88
-.L92:
+	bx	fp
+	b	.L103
+.L105:
+	ldr	r3, .L114+36
 	mov	lr, pc
-	bx	r8
-	b	.L88
-.L93:
+	bx	r3
+	b	.L103
+.L108:
 	mov	lr, pc
 	bx	r9
-	b	.L88
-.L99:
+	b	.L103
+.L109:
+	mov	lr, pc
+	bx	r10
+	b	.L103
+.L115:
 	.align	2
-.L98:
+.L114:
 	.word	67109120
 	.word	buttons
 	.word	goToStart
@@ -700,22 +826,13 @@ main:
 	.word	win
 	.word	game
 	.word	pause
+	.word	lose
 	.size	main, .-main
-	.text
-	.align	2
-	.global	lose
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	lose, %function
-lose:
-	@ Function supports interworking.
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	b	win
-	.size	lose, .-lose
 	.comm	seed,4,4
+	.comm	vOffCounter,2,2
+	.comm	hOffCounter,2,2
+	.comm	vOff,2,2
+	.comm	hOff,2,2
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2
 	.comm	cursorCol,4,4
