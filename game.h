@@ -2,8 +2,7 @@
 #define PLAYERCOLS 3
 #define PLAYERSPRITESCALE 4
 #define MAXENEMIES 8
-#define ENEMYSPAWNRATEBASE 100
-#define ENEMYMOVEMENTTIME 500
+#define ENEMYSPAWNRATEBASE 200
 #define MAXQUARANTINES 5
 #define MAXSYRINGES 10
 #define MAXRNAS 16
@@ -13,9 +12,10 @@
 #define GRIDLEFTPIXEL 4
 #define GRIDRIGHTPIXEL 84
 #define ENEMYFIRERATE 200
-
+#define WINCONDITION 10
 int rand();
 void goToLose();
+void goToWin();
 void initGame();
 void initPlayer();
 void initEnemies();

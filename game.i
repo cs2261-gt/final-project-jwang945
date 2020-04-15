@@ -111,9 +111,10 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 17 "game.h"
+# 16 "game.h"
 int rand();
 void goToLose();
+void goToWin();
 void initGame();
 void initPlayer();
 void initEnemies();
@@ -211,6 +212,7 @@ RNA rnas[16];
 HEART hearts[5];
 int enemiesOnScreen;
 int enemySpawnRate;
+int enemiesKilled;
 
 void initGame() {
 
@@ -218,7 +220,8 @@ void initGame() {
     initPlayer();
     initEnemies();
     enemiesOnScreen = 0;
-    enemySpawnRate = 100 + (rand()%50);
+    enemySpawnRate = 200 + (rand()%50);
+    enemiesKilled = 0;
     initQuarantines();
     initSyringes();
     initRNAs();
@@ -320,6 +323,10 @@ void updateGame() {
     updateHearts();
 
 
+    if (enemiesKilled >= 10) {
+        goToWin();
+    }
+
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
 }
@@ -393,7 +400,9 @@ void updateEnemies() {
             if (enemies[i].health <= 0) {
                 enemies[i].active = 0;
                 enemies[i].erased = 1;
+                enemies[i].RNATimer = 0;
                 enemiesOnScreen--;
+                enemiesKilled++;
             }
             if (enemies[i].erased) {
                 shadowOAM[i + 1].attr0 = (2<<8);

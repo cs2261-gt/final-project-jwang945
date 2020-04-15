@@ -1,3 +1,7 @@
+/*
+CORONA KING
+Control the player on the left side of the grid and press A to shoot. Kill 10 enemies to win!
+*/
 #include "myLib.h"
 #include "startscreen.h"
 #include "mainscreen.h"

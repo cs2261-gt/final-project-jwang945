@@ -12,6 +12,7 @@ RNA rnas[MAXRNAS];// OAM[24] - OAM[39]
 HEART hearts[MAXHEARTS];// OAM[40] - OAM[45]
 int enemiesOnScreen;
 int enemySpawnRate;
+int enemiesKilled;
 
 void initGame() {
     //sprite pal and stuff are loaded in goToStart()
@@ -20,6 +21,7 @@ void initGame() {
     initEnemies();
     enemiesOnScreen = 0;
     enemySpawnRate = ENEMYSPAWNRATEBASE + (rand()%50);
+    enemiesKilled = 0;
     initQuarantines();
     initSyringes();
     initRNAs();
@@ -120,6 +122,10 @@ void updateGame() {
     updateRNAs();
     updateHearts();
 
+    //check win condition
+    if (enemiesKilled >= WINCONDITION) {
+        goToWin();
+    }
     //copy to real OAM
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 128 * 4);
@@ -194,7 +200,9 @@ void updateEnemies() {
             if (enemies[i].health <= 0) {
                 enemies[i].active = 0;
                 enemies[i].erased = 1;
+                enemies[i].RNATimer = 0;
                 enemiesOnScreen--;
+                enemiesKilled++;
             }
             if (enemies[i].erased) {
                 shadowOAM[i + 1].attr0 = ATTR0_HIDE;
