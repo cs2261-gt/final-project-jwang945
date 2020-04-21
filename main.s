@@ -71,7 +71,7 @@ goToStart:
 	str	r5, [ip]
 	mov	lr, pc
 	bx	r4
-	mov	r3, #560
+	mov	r3, #1744
 	mov	r2, #100663296
 	mov	r0, #3
 	ldr	r1, .L4+60

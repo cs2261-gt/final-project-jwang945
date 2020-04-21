@@ -118,7 +118,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 8 "main.c" 2
 # 1 "startscreen.h" 1
 # 22 "startscreen.h"
-extern const unsigned short startscreenTiles[560];
+extern const unsigned short startscreenTiles[1744];
 
 
 extern const unsigned short startscreenMap[1024];
@@ -289,7 +289,7 @@ void goToStart() {
 
     DMANow(3, startscreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, startscreenTiles, &((charblock *)0x6000000)[0], 1120/2);
+    DMANow(3, startscreenTiles, &((charblock *)0x6000000)[0], 3488/2);
 
     DMANow(3, startscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }

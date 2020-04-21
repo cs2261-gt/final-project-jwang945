@@ -5,11 +5,11 @@
 //
 //	startscreen, 256x256@4, 
 //	+ palette 256 entries, not compressed
-//	+ 35 tiles (t|f|p reduced) not compressed
+//	+ 109 tiles (t|f|p reduced) not compressed
 //	+ regular map (in SBBs), not compressed, 32x32 
-//	Total size: 512 + 1120 + 2048 = 3680
+//	Total size: 512 + 3488 + 2048 = 6048
 //
-//	Time-stamp: 2020-04-08, 16:46:54
+//	Time-stamp: 2020-04-21, 01:48:19
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -18,8 +18,8 @@
 #ifndef GRIT_STARTSCREEN_H
 #define GRIT_STARTSCREEN_H
 
-#define startscreenTilesLen 1120
-extern const unsigned short startscreenTiles[560];
+#define startscreenTilesLen 3488
+extern const unsigned short startscreenTiles[1744];
 
 #define startscreenMapLen 2048
 extern const unsigned short startscreenMap[1024];
