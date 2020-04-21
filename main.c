@@ -85,6 +85,10 @@ int main() {
 }
 
 void initialize() {
+    //clear display register
+    REG_DISPCTL = 0;
+    REG_BG0CNT = 0;
+    REG_BG1CNT = 0;
     //set up display register
     REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
     //set up bg register
@@ -103,6 +107,7 @@ void goToStart() {
 
     cursorRow = 102;
     cursorCol = 8;
+
 
     //load sprite palette
     DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen/2);
@@ -166,7 +171,7 @@ void goToInstructions() {
 void instructions() {
     waitForVBlank();
     if (BUTTON_PRESSED(BUTTON_START)) {
-        goToStart();
+        initialize();
     }
 }
 
@@ -193,7 +198,6 @@ void game() {
 }
 
 void goToPause() {
-
     waitForVBlank();
     state = PAUSE;
 }
@@ -241,8 +245,9 @@ void win() {
     REG_BG0VOFF = vOff;
     REG_BG1HOFF = hOff;
     // State transitions
-    if (BUTTON_PRESSED(BUTTON_START))
-        goToStart();
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        initialize();
+    }
 }
 
 void goToLose() {
@@ -283,6 +288,6 @@ void lose() {
     REG_BG1HOFF = hOff;
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START)) {
-        goToStart();
+        initialize();
     }
 }
