@@ -229,7 +229,6 @@ int quarantineSpawnRate;
 
 void initGame() {
 
-
     initPlayer();
     initEnemies();
     enemiesOnScreen = 0;
@@ -486,6 +485,14 @@ void updateQuarantines() {
                 quarantines[i].aniCounter = 0;
 
                 quarantines[i].curFrame++;
+            }
+
+            if (quarantines[i].curFrame == 2 || quarantines[i].curFrame== 3) {
+                if (quarantines[i].curFrame == 2) {
+                    quarantines[i].curFrame = 3;
+                } else {
+                    quarantines[i].curFrame = 2;
+                }
             }
 
             if (quarantines[i].curFrame > quarantines[i].numFrames) {
