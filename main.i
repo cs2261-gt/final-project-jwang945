@@ -2,7 +2,12 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "main.c"
-# 9 "main.c"
+
+
+
+
+
+
 # 1 "myLib.h" 1
 
 
@@ -110,7 +115,7 @@ typedef struct{
 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 10 "main.c" 2
+# 8 "main.c" 2
 # 1 "startscreen.h" 1
 # 22 "startscreen.h"
 extern const unsigned short startscreenTiles[560];
@@ -120,7 +125,7 @@ extern const unsigned short startscreenMap[1024];
 
 
 extern const unsigned short startscreenPal[256];
-# 11 "main.c" 2
+# 9 "main.c" 2
 # 1 "mainscreen.h" 1
 # 22 "mainscreen.h"
 extern const unsigned short mainscreenTiles[1024];
@@ -130,7 +135,7 @@ extern const unsigned short mainscreenMap[1024];
 
 
 extern const unsigned short mainscreenPal[256];
-# 12 "main.c" 2
+# 10 "main.c" 2
 # 1 "losescreen.h" 1
 # 22 "losescreen.h"
 extern const unsigned short losescreenTiles[640];
@@ -140,7 +145,7 @@ extern const unsigned short losescreenMap[1024];
 
 
 extern const unsigned short losescreenPal[256];
-# 13 "main.c" 2
+# 11 "main.c" 2
 # 1 "winscreen.h" 1
 # 22 "winscreen.h"
 extern const unsigned short winscreenTiles[528];
@@ -150,7 +155,7 @@ extern const unsigned short winscreenMap[1024];
 
 
 extern const unsigned short winscreenPal[256];
-# 14 "main.c" 2
+# 12 "main.c" 2
 # 1 "instructionsscreen.h" 1
 # 22 "instructionsscreen.h"
 extern const unsigned short instructionsscreenTiles[176];
@@ -160,14 +165,14 @@ extern const unsigned short instructionsscreenMap[1024];
 
 
 extern const unsigned short instructionsscreenPal[256];
-# 15 "main.c" 2
+# 13 "main.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
-# 16 "main.c" 2
+# 14 "main.c" 2
 # 1 "retrobackground.h" 1
 # 22 "retrobackground.h"
 extern const unsigned short retrobackgroundTiles[8128];
@@ -177,7 +182,7 @@ extern const unsigned short retrobackgroundMap[1024];
 
 
 extern const unsigned short retrobackgroundPal[256];
-# 17 "main.c" 2
+# 15 "main.c" 2
 
 
 

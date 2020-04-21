@@ -361,10 +361,6 @@ void updateGame() {
 
 void updatePlayer() {
 
-
-
-
-
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && player.row > 4) {
         player.row -= player.rdel;
     }

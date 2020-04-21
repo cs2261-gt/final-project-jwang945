@@ -3,8 +3,6 @@ CORONA KING
 Control the player on the left side of the grid and press A to shoot. Kill 10 enemies to win!
 For M03, the parallax background requirement is in the win and lose screen. Get to lose screen by pressing B for now or lose all hearts.
 
-
-CURRENTLY HAS BUG THAT SOMETIMES QUARANTINE WILL REMAIN ON LOSEE SCREEN AFTER DYING TO IT
 */
 #include "myLib.h"
 #include "startscreen.h"
