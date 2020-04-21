@@ -139,16 +139,16 @@ void updateGame() {
     if (enemiesKilled >= WINCONDITION) {
         goToWin();
     }
+    //check lose condition
+    if (player.health <= 0) {
+        goToLose();
+    }
     //copy to real OAM
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 128 * 4);
 }
 
 void updatePlayer() {
-    //check if player died
-    if (player.health <= 0) {
-        goToLose();
-    }
     //player movement logic
     if (BUTTON_PRESSED(BUTTON_UP) && player.row > GRIDTOPPIXEL) {
         player.row -= player.rdel;
@@ -249,6 +249,7 @@ void updateQuarantines() {
                     quarantines[i].erased = 0;
                     quarantines[i].aniCounter = 0;
                     quarantines[i].curFrame = 0;
+                    quarantines[i].hitPlayer = 0;
                     findRowAndColForQuarantine(&quarantines[i]);
                     quarantinesOnScreen++;
                 }
@@ -259,6 +260,15 @@ void updateQuarantines() {
     //draw quarantines
     for (int i = 0; i < MAXQUARANTINES; i++) {
         if (quarantines[i].active) {
+            //check for damage, only do damage if quarantine is on last frame and hasn't already hit player
+            if ((quarantines[i].curFrame == quarantines[i].numFrames) && !quarantines[i].hitPlayer) {
+                //if hit player, deal damage, set hitPlayer to true
+                if (collision(player.col, player.row, player.width, player.height, quarantines[i].col, quarantines[i].row, quarantines[i].width, quarantines[i].height)) {
+                    quarantines[i].hitPlayer = 1;
+                    player.health--;
+                    player.tookDamageFlag = 1;
+                }
+            }
             //update aniCounter
             quarantines[i].aniCounter++;
             if (quarantines[i].aniCounter == QUARANTINEANIMATIONRATE) {

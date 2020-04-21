@@ -175,6 +175,7 @@ typedef struct {
     int curFrame;
     int numFrames;
     int aniCounter;
+    int hitPlayer;
 } QUARANTINE;
 
 typedef struct {
@@ -350,15 +351,19 @@ void updateGame() {
         goToWin();
     }
 
+    if (player.health <= 0) {
+        goToLose();
+    }
+
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
 }
 
 void updatePlayer() {
 
-    if (player.health <= 0) {
-        goToLose();
-    }
+
+
+
 
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && player.row > 4) {
         player.row -= player.rdel;
@@ -459,6 +464,7 @@ void updateQuarantines() {
                     quarantines[i].erased = 0;
                     quarantines[i].aniCounter = 0;
                     quarantines[i].curFrame = 0;
+                    quarantines[i].hitPlayer = 0;
                     findRowAndColForQuarantine(&quarantines[i]);
                     quarantinesOnScreen++;
                 }
@@ -469,6 +475,15 @@ void updateQuarantines() {
 
     for (int i = 0; i < 5; i++) {
         if (quarantines[i].active) {
+
+            if ((quarantines[i].curFrame == quarantines[i].numFrames) && !quarantines[i].hitPlayer) {
+
+                if (collision(player.col, player.row, player.width, player.height, quarantines[i].col, quarantines[i].row, quarantines[i].width, quarantines[i].height)) {
+                    quarantines[i].hitPlayer = 1;
+                    player.health--;
+                    player.tookDamageFlag = 1;
+                }
+            }
 
             quarantines[i].aniCounter++;
             if (quarantines[i].aniCounter == 50) {

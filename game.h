@@ -80,6 +80,7 @@ typedef struct {
     int curFrame;
     int numFrames;
     int aniCounter;
+    int hitPlayer;
 } QUARANTINE;
 
 typedef struct {
