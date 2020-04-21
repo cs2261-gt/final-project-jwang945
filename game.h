@@ -4,7 +4,8 @@
 #define MAXENEMIES 8
 #define ENEMYSPAWNRATEBASE 200
 #define MAXQUARANTINES 5
-#define QUARANTINESPAWNRATEBASE 220
+#define QUARANTINESPAWNRATEBASE 100
+#define QUARANTINEANIMATIONRATE 50
 #define MAXSYRINGES 10
 #define MAXRNAS 16
 #define MAXHEARTS 5
@@ -72,6 +73,9 @@ typedef struct {
     int active;
     int erased;
     int spawnTimer;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
 } QUARANTINE;
 
 typedef struct {

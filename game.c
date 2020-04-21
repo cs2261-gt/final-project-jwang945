@@ -81,6 +81,9 @@ void initQuarantines() {
         quarantines[i].active = 0;
         quarantines[i].erased = 0;
         quarantines[i].spawnTimer = 0;
+        quarantines[i].curFrame = 1;
+        quarantines[i].numFrames = 4; //goes 1-4
+        quarantines[i].aniCounter = 0;
     }
 }
 
@@ -235,6 +238,8 @@ void updateQuarantines() {
                     quarantines[i].spawnTimer = 0;
                     quarantines[i].active = 1;
                     quarantines[i].erased = 0;
+                    quarantines[i].aniCounter = 0;
+                    quarantines[i].curFrame = 0;
                     findRowAndColForQuarantine(&quarantines[i]);
                     quarantinesOnScreen++;
                 }
@@ -245,9 +250,25 @@ void updateQuarantines() {
     //draw quarantines
     for (int i = 0; i < MAXQUARANTINES; i++) {
         if (quarantines[i].active) {
-            shadowOAM[i + 9].attr0 = quarantines[i].row | ATTR0_4BPP | ATTR0_SQUARE;
-            shadowOAM[i + 9].attr1 = quarantines[i].col | ATTR1_MEDIUM;
-            shadowOAM[i + 9].attr2 = ATTR2_TILEID(0, 2 * 4);
+            //update aniCounter
+            quarantines[i].aniCounter++;
+            if (quarantines[i].aniCounter >= QUARANTINEANIMATIONRATE) {
+                quarantines[i].aniCounter = 0; //reset aniCounter
+                //go up a frame
+                quarantines[i].curFrame++;
+            }
+            //check if exceed last frame
+            if (quarantines[i].curFrame > quarantines[i].numFrames) {
+                //set it as inactive
+                quarantines[i].active = 0;
+                //erase sprite
+                shadowOAM[i + 9].attr0 = ATTR0_HIDE;
+                quarantinesOnScreen--;
+            } else {
+                shadowOAM[i + 9].attr0 = quarantines[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+                shadowOAM[i + 9].attr1 = quarantines[i].col | ATTR1_MEDIUM;
+                shadowOAM[i + 9].attr2 = ATTR2_TILEID(((quarantines[i].curFrame - 1) * 4), 2 * 4);
+            }
         }
     }
 }

@@ -111,7 +111,7 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 18 "game.h"
+# 19 "game.h"
 int rand();
 void goToLose();
 void goToWin();
@@ -169,6 +169,9 @@ typedef struct {
     int active;
     int erased;
     int spawnTimer;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
 } QUARANTINE;
 
 typedef struct {
@@ -230,7 +233,7 @@ void initGame() {
     enemiesKilled = 0;
     initQuarantines();
     quarantinesOnScreen = 0;
-    quarantineSpawnRate = 220 + (rand()%100);
+    quarantineSpawnRate = 100 + (rand()%100);
     initSyringes();
     initRNAs();
     initHearts();
@@ -285,6 +288,9 @@ void initQuarantines() {
         quarantines[i].active = 0;
         quarantines[i].erased = 0;
         quarantines[i].spawnTimer = 0;
+        quarantines[i].curFrame = 1;
+        quarantines[i].numFrames = 4;
+        quarantines[i].aniCounter = 0;
     }
 }
 
@@ -439,6 +445,8 @@ void updateQuarantines() {
                     quarantines[i].spawnTimer = 0;
                     quarantines[i].active = 1;
                     quarantines[i].erased = 0;
+                    quarantines[i].aniCounter = 0;
+                    quarantines[i].curFrame = 0;
                     findRowAndColForQuarantine(&quarantines[i]);
                     quarantinesOnScreen++;
                 }
@@ -449,9 +457,25 @@ void updateQuarantines() {
 
     for (int i = 0; i < 5; i++) {
         if (quarantines[i].active) {
-            shadowOAM[i + 9].attr0 = quarantines[i].row | (0<<13) | (0<<14);
-            shadowOAM[i + 9].attr1 = quarantines[i].col | (2<<14);
-            shadowOAM[i + 9].attr2 = ((2 * 4)*32+(0));
+
+            quarantines[i].aniCounter++;
+            if (quarantines[i].aniCounter >= 50) {
+                quarantines[i].aniCounter = 0;
+
+                quarantines[i].curFrame++;
+            }
+
+            if (quarantines[i].curFrame > quarantines[i].numFrames) {
+
+                quarantines[i].active = 0;
+
+                shadowOAM[i + 9].attr0 = (2<<8);
+                quarantinesOnScreen--;
+            } else {
+                shadowOAM[i + 9].attr0 = quarantines[i].row | (0<<13) | (0<<14);
+                shadowOAM[i + 9].attr1 = quarantines[i].col | (2<<14);
+                shadowOAM[i + 9].attr2 = ((2 * 4)*32+(((quarantines[i].curFrame - 1) * 4)));
+            }
         }
     }
 }

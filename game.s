@@ -116,23 +116,25 @@ initGame:
 	str	r4, [r3]
 	mov	lr, pc
 	bx	r6
+	mov	lr, #4
+	mov	r7, #1
 	mov	r2, #0
 	mov	ip, #40
 	mov	r1, #32
 	ldr	r3, .L27+20
-	smull	r7, lr, r3, r0
+	smull	r9, r8, r3, r0
 	asr	r3, r0, #31
-	rsb	r3, r3, lr, asr #4
+	rsb	r3, r3, r8, asr lr
 	add	r3, r3, r3, lsl #2
 	add	r3, r3, r3, lsl #2
-	sub	r0, r0, r3, lsl #1
-	ldr	r3, .L27+24
-	add	r0, r0, #200
-	str	r0, [r3]
+	sub	r3, r0, r3, lsl r7
+	ldr	r0, .L27+24
+	add	r3, r3, #200
+	str	r3, [r0]
 	ldr	r0, .L27+28
 	ldr	r3, .L27+32
 	str	r4, [r0]
-	add	r0, r3, #180
+	add	r0, r3, #240
 .L17:
 	str	r2, [r3]
 	str	ip, [r3, #12]
@@ -141,8 +143,11 @@ initGame:
 	str	r2, [r3, #24]
 	str	r2, [r3, #28]
 	str	r2, [r3, #32]
+	str	r7, [r3, #36]
+	str	lr, [r3, #40]
+	str	r2, [r3, #44]
 	stmib	r3, {r2, ip}
-	add	r3, r3, #36
+	add	r3, r3, #48
 	cmp	r3, r0
 	bne	.L17
 	ldr	r3, .L27+36
@@ -160,7 +165,7 @@ initGame:
 	add	r3, r3, r3, lsl r4
 	ldr	ip, .L27+40
 	sub	r0, r0, r3, lsl r4
-	add	r0, r0, #220
+	add	r0, r0, #100
 	ldr	r3, .L27+44
 	str	r0, [ip]
 	ldr	lr, [r5]
@@ -336,12 +341,14 @@ initQuarantines:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
+	push	{r4, lr}
 	mov	r2, #0
 	mov	r0, #40
 	mov	r1, #32
+	mov	r4, #1
+	mov	lr, #4
 	ldr	r3, .L43
-	add	ip, r3, #180
+	add	ip, r3, #240
 .L40:
 	str	r2, [r3]
 	str	r2, [r3, #4]
@@ -352,9 +359,13 @@ initQuarantines:
 	str	r2, [r3, #24]
 	str	r2, [r3, #28]
 	str	r2, [r3, #32]
-	add	r3, r3, #36
+	str	r4, [r3, #36]
+	str	lr, [r3, #40]
+	str	r2, [r3, #44]
+	add	r3, r3, #48
 	cmp	r3, ip
 	bne	.L40
+	pop	{r4, lr}
 	bx	lr
 .L44:
 	.align	2
@@ -955,7 +966,7 @@ findRowAndColForQuarantine:
 	moveq	ip, #0
 	moveq	r4, ip
 .L150:
-	add	r3, r3, #36
+	add	r3, r3, #48
 	cmp	r10, r3
 	bne	.L151
 	cmp	ip, #0
@@ -992,7 +1003,7 @@ findRowAndColForQuarantine:
 	cmp	r0, r1
 	moveq	ip, #0
 .L153:
-	add	r3, r3, #36
+	add	r3, r3, #48
 	cmp	r3, r10
 	bne	.L154
 	cmp	ip, #0
@@ -1002,7 +1013,7 @@ findRowAndColForQuarantine:
 	.align	2
 .L170:
 	.word	rand
-	.word	quarantines+180
+	.word	quarantines+240
 	.word	1431655766
 	.word	1717986919
 	.word	player
@@ -1018,67 +1029,92 @@ updateQuarantines:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
-	ldr	r4, .L187
-	ldr	r3, [r4]
-	cmp	r3, #4
-	bgt	.L175
-	ldr	r0, .L187+4
+	push	{r4, r5, r6, r7, r8, lr}
+	ldr	r4, .L193
+	ldr	ip, [r4]
+	cmp	ip, #4
+	bgt	.L173
+	ldr	r0, .L193+4
 	mov	r3, #0
 	mov	r2, r0
-.L176:
+.L175:
 	ldr	r1, [r2, #24]
 	cmp	r1, #0
-	beq	.L186
+	beq	.L192
 	add	r3, r3, #1
 	cmp	r3, #5
-	add	r2, r2, #36
-	bne	.L176
-.L175:
-	mov	r4, #256
-	ldr	r3, .L187+4
-	ldr	r2, .L187+8
-	ldr	lr, .L187+12
-	add	r0, r3, #180
-.L178:
+	add	r2, r2, #48
+	bne	.L175
+.L173:
+	mov	lr, #0
+	mov	r7, #512
+	mov	r5, lr
+	ldr	r3, .L193+4
+	ldr	r2, .L193+8
+	ldr	r6, .L193+12
+	add	r0, r3, #240
+.L180:
 	ldr	r1, [r3, #24]
 	cmp	r1, #0
-	beq	.L177
-	ldr	r1, [r3, #4]
-	ldr	ip, [r3]
-	orr	r1, r1, lr
-	strh	r4, [r2, #76]	@ movhi
-	strh	r1, [r2, #74]	@ movhi
-	strh	ip, [r2, #72]	@ movhi
-.L177:
-	add	r3, r3, #36
+	beq	.L176
+	ldr	r1, [r3, #44]
+	add	r1, r1, #1
+	cmp	r1, #49
+	str	r1, [r3, #44]
+	ldr	r1, [r3, #36]
+	ldr	r8, [r3, #40]
+	addgt	r1, r1, #1
+	strgt	r5, [r3, #44]
+	strgt	r1, [r3, #36]
+	cmp	r8, r1
+	bge	.L179
+	mov	lr, #1
+	str	r5, [r3, #24]
+	strh	r7, [r2, #72]	@ movhi
+	sub	ip, ip, #1
+.L176:
+	add	r3, r3, #48
 	cmp	r3, r0
 	add	r2, r2, #8
-	bne	.L178
-	pop	{r4, lr}
+	bne	.L180
+	cmp	lr, #0
+	strne	ip, [r4]
+	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L186:
-	add	r3, r3, r3, lsl #3
-	add	r0, r0, r3, lsl #2
-	ldr	r2, .L187+16
+.L179:
+	ldr	r8, [r3, #4]
+	orr	r8, r8, r6
+	strh	r8, [r2, #74]	@ movhi
+	add	r1, r1, #63
+	ldr	r8, [r3]
+	lsl	r1, r1, #2
+	strh	r1, [r2, #76]	@ movhi
+	strh	r8, [r2, #72]	@ movhi
+	b	.L176
+.L192:
+	add	r3, r3, r3, lsl #1
+	add	r0, r0, r3, lsl #4
+	ldr	r2, .L193+16
 	ldr	r3, [r0, #32]
 	ldr	r2, [r2]
 	add	r3, r3, #1
 	cmp	r3, r2
 	str	r3, [r0, #32]
-	bne	.L175
+	bne	.L173
 	mov	r3, #1
 	str	r1, [r0, #32]
-	str	r3, [r0, #24]
 	str	r1, [r0, #28]
+	str	r1, [r0, #44]
+	str	r1, [r0, #36]
+	str	r3, [r0, #24]
 	bl	findRowAndColForQuarantine
-	ldr	r3, [r4]
-	add	r3, r3, #1
-	str	r3, [r4]
-	b	.L175
-.L188:
+	ldr	ip, [r4]
+	add	ip, ip, #1
+	str	ip, [r4]
+	b	.L173
+.L194:
 	.align	2
-.L187:
+.L193:
 	.word	quarantinesOnScreen
 	.word	quarantines
 	.word	shadowOAM
@@ -1095,22 +1131,22 @@ fireSyringe:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r0, .L199
+	ldr	r0, .L205
 	mov	r3, #0
 	mov	r2, r0
-	b	.L192
-.L190:
+	b	.L198
+.L196:
 	add	r3, r3, #1
 	cmp	r3, #10
 	add	r2, r2, #28
 	bxeq	lr
-.L192:
+.L198:
 	ldr	r1, [r2, #20]
 	cmp	r1, #0
-	bne	.L190
+	bne	.L196
 	push	{r4, r5, r6, lr}
 	mov	r6, #1
-	ldr	lr, .L199+4
+	ldr	lr, .L205+4
 	rsb	r3, r3, r3, lsl #3
 	ldr	r2, [lr, #20]
 	add	ip, r0, r3, lsl #2
@@ -1129,9 +1165,9 @@ fireSyringe:
 	str	r2, [r0, r3, lsl #2]
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L200:
+.L206:
 	.align	2
-.L199:
+.L205:
 	.word	syringes
 	.word	player
 	.size	fireSyringe, .-fireSyringe
@@ -1146,102 +1182,102 @@ updatePlayer:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r4, .L231
+	ldr	r4, .L237
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	ble	.L225
-.L202:
-	ldr	r3, .L231+4
+	ble	.L231
+.L208:
+	ldr	r3, .L237+4
 	ldrh	r3, [r3]
 	tst	r3, #64
-	beq	.L203
-	ldr	r2, .L231+8
+	beq	.L209
+	ldr	r2, .L237+8
 	ldrh	r2, [r2]
 	tst	r2, #64
-	beq	.L226
-.L203:
+	beq	.L232
+.L209:
 	tst	r3, #128
-	beq	.L204
-	ldr	r2, .L231+8
+	beq	.L210
+	ldr	r2, .L237+8
 	ldrh	r2, [r2]
 	tst	r2, #128
-	beq	.L227
-.L204:
+	beq	.L233
+.L210:
 	tst	r3, #32
-	beq	.L205
-	ldr	r2, .L231+8
+	beq	.L211
+	ldr	r2, .L237+8
 	ldrh	r2, [r2]
 	tst	r2, #32
-	beq	.L228
-.L205:
+	beq	.L234
+.L211:
 	tst	r3, #16
-	beq	.L206
-	ldr	r2, .L231+8
+	beq	.L212
+	ldr	r2, .L237+8
 	ldrh	r2, [r2]
 	tst	r2, #16
-	beq	.L229
-.L206:
+	beq	.L235
+.L212:
 	tst	r3, #1
-	beq	.L207
-	ldr	r3, .L231+8
+	beq	.L213
+	ldr	r3, .L237+8
 	ldrh	r3, [r3]
 	tst	r3, #1
-	beq	.L230
-.L207:
+	beq	.L236
+.L213:
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	ble	.L201
+	ble	.L207
 	ldr	r3, [r4, #4]
 	mvn	r3, r3, lsl #17
 	mov	r1, #0
 	mvn	r3, r3, lsr #17
-	ldr	r2, .L231+12
+	ldr	r2, .L237+12
 	ldr	r0, [r4]
 	strh	r3, [r2, #2]	@ movhi
 	strh	r0, [r2]	@ movhi
 	strh	r1, [r2, #4]	@ movhi
-.L201:
+.L207:
 	pop	{r4, lr}
 	bx	lr
-.L229:
+.L235:
 	ldr	r2, [r4, #4]
 	cmp	r2, #83
 	ldrle	r1, [r4, #8]
 	addle	r2, r1, r2
 	strle	r2, [r4, #4]
-	b	.L206
-.L228:
+	b	.L212
+.L234:
 	ldr	r2, [r4, #4]
 	cmp	r2, #4
 	ldrgt	r1, [r4, #8]
 	subgt	r2, r2, r1
 	strgt	r2, [r4, #4]
-	b	.L205
-.L227:
+	b	.L211
+.L233:
 	ldr	r2, [r4]
 	cmp	r2, #123
 	ldrle	r1, [r4, #12]
 	addle	r2, r1, r2
 	strle	r2, [r4]
-	b	.L204
-.L226:
+	b	.L210
+.L232:
 	ldr	r2, [r4]
 	cmp	r2, #4
 	ldrgt	r1, [r4, #12]
 	subgt	r2, r2, r1
 	strgt	r2, [r4]
-	b	.L203
-.L225:
-	ldr	r3, .L231+16
+	b	.L209
+.L231:
+	ldr	r3, .L237+16
 	mov	lr, pc
 	bx	r3
-	b	.L202
-.L230:
+	b	.L208
+.L236:
 	bl	fireSyringe
-	b	.L207
-.L232:
+	b	.L213
+.L238:
 	.align	2
-.L231:
+.L237:
 	.word	player
 	.word	oldButtons
 	.word	buttons
@@ -1264,36 +1300,36 @@ updateGame:
 	bl	updateQuarantines
 	bl	updateSyringes
 	bl	updateRNAs
-	ldr	r3, .L241
+	ldr	r3, .L247
 	ldr	r3, [r3, #32]
 	cmp	r3, #0
 	blne	updateHearts.part.0
-.L234:
-	ldr	r3, .L241+4
+.L240:
+	ldr	r3, .L247+4
 	ldr	r3, [r3]
 	cmp	r3, #9
-	bgt	.L240
-.L235:
-	ldr	r3, .L241+8
+	bgt	.L246
+.L241:
+	ldr	r3, .L247+8
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L241+12
+	ldr	r4, .L247+12
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L241+16
+	ldr	r1, .L247+16
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
 	bx	lr
-.L240:
-	ldr	r3, .L241+20
+.L246:
+	ldr	r3, .L247+20
 	mov	lr, pc
 	bx	r3
-	b	.L235
-.L242:
+	b	.L241
+.L248:
 	.align	2
-.L241:
+.L247:
 	.word	player
 	.word	enemiesKilled
 	.word	waitForVBlank
@@ -1309,7 +1345,7 @@ updateGame:
 	.comm	hearts,80,4
 	.comm	rnas,448,4
 	.comm	syringes,280,4
-	.comm	quarantines,180,4
+	.comm	quarantines,240,4
 	.comm	enemies,352,4
 	.comm	player,36,4
 	.comm	shadowOAM,1024,4
