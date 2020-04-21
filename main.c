@@ -93,6 +93,13 @@ void initialize() {
 }
 
 void goToStart() {
+    //make sure that when game loses/wins and restarts, offset is reset to 0
+    hOff = 0;
+    vOff = 0;
+    waitForVBlank();
+    REG_BG0VOFF = vOff;
+    REG_BG1HOFF = hOff;
+
     cursorRow = 102;
     cursorCol = 8;
 

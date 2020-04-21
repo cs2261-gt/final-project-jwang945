@@ -21,73 +21,86 @@ goToStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	ip, #8
-	mov	r1, #102
-	push	{r4, r5, r6, lr}
+	push	{r4, r5, r6, r7, r8, lr}
 	mov	r5, #0
-	ldr	r2, .L4
-	ldr	r0, .L4+4
-	ldr	r4, .L4+8
-	str	ip, [r0]
-	str	r1, [r2]
+	ldr	r4, .L4
+	ldr	r7, .L4+4
+	ldr	r6, .L4+8
+	str	r5, [r4]
+	str	r5, [r7]
+	mov	lr, pc
+	bx	r6
+	mov	r3, #67108864
+	mov	r0, #102
+	mov	lr, #8
+	ldrh	r2, [r7]
+	ldr	r1, .L4+12
+	strh	r2, [r3, #18]	@ movhi
+	ldrh	r2, [r4]
+	ldr	ip, .L4+16
+	ldr	r4, .L4+20
+	strh	r2, [r3, #20]	@ movhi
+	str	r0, [r1]
 	mov	r3, #256
 	mov	r0, #3
-	ldr	r2, .L4+12
-	ldr	r1, .L4+16
+	ldr	r2, .L4+24
+	ldr	r1, .L4+28
+	str	lr, [ip]
 	mov	lr, pc
 	bx	r4
 	mov	r0, #3
-	ldr	r2, .L4+20
-	ldr	r1, .L4+24
+	ldr	r1, .L4+32
+	ldr	r2, .L4+36
 	mov	r3, #16384
 	mov	lr, pc
 	bx	r4
-	ldr	r3, .L4+28
-	mov	lr, pc
-	bx	r3
-	ldr	r1, .L4+32
-	ldr	r2, .L4+36
 	ldr	r3, .L4+40
-	str	r5, [r1]
-	str	r5, [r2]
 	mov	lr, pc
 	bx	r3
-	ldr	r0, .L4+44
+	ldr	r2, .L4+44
+	ldr	r3, .L4+48
+	str	r5, [r2]
+	str	r5, [r3]
+	mov	lr, pc
+	bx	r6
+	ldr	ip, .L4+52
 	mov	r3, #256
-	str	r5, [r0]
 	mov	r2, #83886080
 	mov	r0, #3
-	ldr	r1, .L4+48
+	ldr	r1, .L4+56
+	str	r5, [ip]
 	mov	lr, pc
 	bx	r4
 	mov	r3, #560
 	mov	r2, #100663296
 	mov	r0, #3
-	ldr	r1, .L4+52
+	ldr	r1, .L4+60
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L4+56
-	ldr	r1, .L4+60
+	ldr	r2, .L4+64
+	ldr	r1, .L4+68
 	mov	lr, pc
 	bx	r4
-	pop	{r4, r5, r6, lr}
+	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
 .L5:
 	.align	2
 .L4:
+	.word	hOff
+	.word	vOff
+	.word	waitForVBlank
 	.word	cursorRow
 	.word	cursorCol
 	.word	DMANow
 	.word	83886592
 	.word	spritesheetPal
-	.word	100728832
 	.word	spritesheetTiles
+	.word	100728832
 	.word	hideSprites
 	.word	startScreenIndex
 	.word	seed
-	.word	waitForVBlank
 	.word	state
 	.word	startscreenPal
 	.word	startscreenTiles
