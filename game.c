@@ -67,6 +67,9 @@ void initEnemies() {
         enemies[i].erased = 0;
         enemies[i].spawnTimer = 0;
         enemies[i].RNATimer = 0;
+        enemies[i].curFrame = 1;
+        enemies[i].numFrames = 4;
+        enemies[i].aniCounter = 0;
     }
 }
 
@@ -214,6 +217,12 @@ void updateEnemies() {
                 enemiesOnScreen--;
                 enemiesKilled++;
             }
+            //update animation
+            enemies[i].aniCounter++;
+            if (enemies[i].aniCounter == ENEMYANIMATIONRATE) {
+                enemies[i].aniCounter = 0;
+                enemies[i].curFrame = enemies[i].curFrame==enemies[i].numFrames ? 1 : enemies[i].curFrame + 1; //if on last frame, reset to 0, else add 1
+            }
             if (enemies[i].erased) {
                 shadowOAM[i + 1].attr0 = ATTR0_HIDE;
             } else {
@@ -221,7 +230,7 @@ void updateEnemies() {
                 if (player.health > 0) {
                     shadowOAM[i + 1].attr0 = enemies[i].row | ATTR0_4BPP | ATTR0_SQUARE;
                     shadowOAM[i + 1].attr1 = enemies[i].col | ATTR1_MEDIUM;
-                    shadowOAM[i + 1].attr2 = ATTR2_TILEID(0, 1 * 4);
+                    shadowOAM[i + 1].attr2 = ATTR2_TILEID(((enemies[i].curFrame - 1) * 4), 1 * 4);
                 }
             }
         }
@@ -252,7 +261,7 @@ void updateQuarantines() {
         if (quarantines[i].active) {
             //update aniCounter
             quarantines[i].aniCounter++;
-            if (quarantines[i].aniCounter >= QUARANTINEANIMATIONRATE) {
+            if (quarantines[i].aniCounter == QUARANTINEANIMATIONRATE) {
                 quarantines[i].aniCounter = 0; //reset aniCounter
                 //go up a frame
                 quarantines[i].curFrame++;

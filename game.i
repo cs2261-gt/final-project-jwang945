@@ -111,7 +111,7 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 19 "game.h"
+# 20 "game.h"
 int rand();
 void goToLose();
 void goToWin();
@@ -157,6 +157,9 @@ typedef struct {
     int erased;
     int spawnTimer;
     int RNATimer;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
 } ENEMY;
 
 typedef struct {
@@ -274,6 +277,9 @@ void initEnemies() {
         enemies[i].erased = 0;
         enemies[i].spawnTimer = 0;
         enemies[i].RNATimer = 0;
+        enemies[i].curFrame = 1;
+        enemies[i].numFrames = 4;
+        enemies[i].aniCounter = 0;
     }
 }
 
@@ -421,6 +427,12 @@ void updateEnemies() {
                 enemiesOnScreen--;
                 enemiesKilled++;
             }
+
+            enemies[i].aniCounter++;
+            if (enemies[i].aniCounter == 50) {
+                enemies[i].aniCounter = 0;
+                enemies[i].curFrame = enemies[i].curFrame==enemies[i].numFrames ? 1 : enemies[i].curFrame + 1;
+            }
             if (enemies[i].erased) {
                 shadowOAM[i + 1].attr0 = (2<<8);
             } else {
@@ -428,7 +440,7 @@ void updateEnemies() {
                 if (player.health > 0) {
                     shadowOAM[i + 1].attr0 = enemies[i].row | (0<<13) | (0<<14);
                     shadowOAM[i + 1].attr1 = enemies[i].col | (2<<14);
-                    shadowOAM[i + 1].attr2 = ((1 * 4)*32+(0));
+                    shadowOAM[i + 1].attr2 = ((1 * 4)*32+(((enemies[i].curFrame - 1) * 4)));
                 }
             }
         }
@@ -459,7 +471,7 @@ void updateQuarantines() {
         if (quarantines[i].active) {
 
             quarantines[i].aniCounter++;
-            if (quarantines[i].aniCounter >= 50) {
+            if (quarantines[i].aniCounter == 50) {
                 quarantines[i].aniCounter = 0;
 
                 quarantines[i].curFrame++;

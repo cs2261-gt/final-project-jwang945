@@ -3,6 +3,7 @@
 #define PLAYERSPRITESCALE 4
 #define MAXENEMIES 8
 #define ENEMYSPAWNRATEBASE 200
+#define ENEMYANIMATIONRATE 50
 #define MAXQUARANTINES 5
 #define QUARANTINESPAWNRATEBASE 100
 #define QUARANTINEANIMATIONRATE 50
@@ -61,6 +62,9 @@ typedef struct {
     int erased;
     int spawnTimer;
     int RNATimer;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
 } ENEMY;
 
 typedef struct {
