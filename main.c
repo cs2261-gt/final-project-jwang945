@@ -12,6 +12,8 @@ For M03, the parallax background requirement is in the win and lose screen. Get 
 #include "instructionsscreen.h"
 #include "spritesheet.h"
 #include "retrobackground.h"
+#include "sound.h"
+#include "backgroundmusic.h"
 
 #define CURSORROWSPACE 20
 
@@ -55,6 +57,9 @@ unsigned short vOffCounter;
 
 int seed; //random seed
 
+SOUND soundA;
+SOUND soundB;
+
 int main() {
     initialize();
     while(1) {
@@ -93,6 +98,10 @@ void initialize() {
     REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
     //set up bg register
     REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(16) | BG_SIZE_SMALL | BG_4BPP;
+    //set up sounds
+    setupSounds();
+    setupInterrupts();
+
     buttons = BUTTONS;
     goToStart();
 }
@@ -108,6 +117,8 @@ void goToStart() {
     cursorRow = 102;
     cursorCol = 8;
 
+    //play sound
+    playSoundA(backgroundmusic, BACKGROUNDMUSICLEN, 1);
 
     //load sprite palette
     DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen/2);

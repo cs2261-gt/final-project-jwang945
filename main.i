@@ -183,6 +183,30 @@ extern const unsigned short retrobackgroundMap[1024];
 
 extern const unsigned short retrobackgroundPal[256];
 # 15 "main.c" 2
+# 1 "sound.h" 1
+SOUND soundA;
+SOUND soundB;
+
+
+
+void setupSounds();
+void playSoundA(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops);
+
+void setupInterrupts();
+void interruptHandler();
+
+void pauseSound();
+void unpauseSound();
+void stopSound();
+# 16 "main.c" 2
+# 1 "backgroundmusic.h" 1
+
+
+
+
+extern const signed char backgroundmusic[1772064];
+# 17 "main.c" 2
 
 
 
@@ -226,6 +250,9 @@ unsigned short vOffCounter;
 
 int seed;
 
+SOUND soundA;
+SOUND soundB;
+
 int main() {
     initialize();
     while(1) {
@@ -264,6 +291,10 @@ void initialize() {
     (*(unsigned short *)0x4000000) = 0 | (1<<8) | (1<<12);
 
     (*(volatile unsigned short*)0x4000008) = ((0)<<2) | ((16)<<8) | (0<<14) | (0<<7);
+
+    setupSounds();
+    setupInterrupts();
+
     buttons = (*(volatile unsigned short *)0x04000130);
     goToStart();
 }
@@ -279,6 +310,8 @@ void goToStart() {
     cursorRow = 102;
     cursorCol = 8;
 
+
+    playSoundA(backgroundmusic, 1772064, 1);
 
 
     DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512/2);
