@@ -195,7 +195,7 @@ initGame:
 	sub	r0, r0, r3, lsl r7
 	ldr	r8, .L35+28
 	ldr	r3, .L35+32
-	add	r0, r0, #200
+	add	r0, r0, #150
 	str	r6, [r9]
 	str	r0, [r8]
 	add	r0, r3, #260
@@ -1399,6 +1399,41 @@ updateGame:
 	.word	goToWin
 	.word	goToLose
 	.size	updateGame, .-updateGame
+	.align	2
+	.global	drawHearts
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	drawHearts, %function
+drawHearts:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	str	lr, [sp, #-4]!
+	mov	lr, #448
+	ldr	r3, .L267
+	ldr	r2, .L267+4
+	add	r0, r3, #40
+.L261:
+	ldr	r1, [r2, #8]
+	cmp	r1, #0
+	ldrne	ip, [r2]
+	ldrne	r1, [r2, #4]
+	strhne	lr, [r3, #4]	@ movhi
+	strhne	ip, [r3]	@ movhi
+	strhne	r1, [r3, #2]	@ movhi
+	add	r3, r3, #8
+	cmp	r3, r0
+	add	r2, r2, #16
+	bne	.L261
+	ldr	lr, [sp], #4
+	bx	lr
+.L268:
+	.align	2
+.L267:
+	.word	shadowOAM+320
+	.word	hearts
+	.size	drawHearts, .-drawHearts
 	.comm	quarantineSpawnRate,4,4
 	.comm	quarantinesOnScreen,4,4
 	.comm	enemiesKilled,4,4

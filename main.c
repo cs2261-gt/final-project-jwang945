@@ -1,7 +1,6 @@
 /*
 CORONA KING
 Control the player on the left side of the grid and press A to shoot. Kill 10 enemies to win!
-For M03, the parallax background requirement is in the win and lose screen. Get to lose screen by pressing B for now or lose all hearts.
 
 */
 #include "myLib.h"
@@ -10,6 +9,7 @@ For M03, the parallax background requirement is in the win and lose screen. Get 
 #include "losescreen.h"
 #include "winscreen.h"
 #include "instructionsscreen.h"
+#include "pausescreen.h"
 #include "spritesheet.h"
 #include "retrobackground.h"
 #include "sound.h"
@@ -23,7 +23,7 @@ void game();
 void srand();
 void initGame();
 void updateGame();
-
+void drawHearts();
 // State Prototypes
 void goToStart();
 void start();
@@ -207,16 +207,30 @@ void game() {
 }
 
 void goToPause() {
+    pauseSound();
+    hideSprites();
     waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 128 * 4);
     state = PAUSE;
+    //DMA palette
+    DMANow(3, pausescreenPal, PALETTE, 256);
+    //load tiles
+    DMANow(3, pausescreenTiles, &CHARBLOCK[0], pausescreenTilesLen/2);
+    //load map
+    DMANow(3, pausescreenMap, &SCREENBLOCK[16], pausescreenMapLen/2);
 }
 void pause() {
     waitForVBlank();
     // State transitions
-    if (BUTTON_PRESSED(BUTTON_START))
+    if (BUTTON_PRESSED(BUTTON_START)) {
         goToGame();
-    else if (BUTTON_PRESSED(BUTTON_SELECT))
+        unpauseSound();
+        drawHearts(); //need to draw hearts because they aren't drawn every loop and we hide sprites in goToPause()
+    }
+    else if (BUTTON_PRESSED(BUTTON_SELECT)) {
         goToStart();
+        unpauseSound();
+    }
 }
 
 void goToWin() {

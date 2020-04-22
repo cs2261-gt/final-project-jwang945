@@ -458,3 +458,13 @@ void fireSyringe() {
         }
     }
 }
+
+void drawHearts() {
+    for (int i = 0; i < MAXHEARTS; i++) {
+        if (hearts[i].active) {
+            shadowOAM[i + 40].attr0 = hearts[i].row | ATTR0_4BPP | ATTR0_SQUARE;
+            shadowOAM[i + 40].attr1 = hearts[i].col | ATTR1_TINY;
+            shadowOAM[i + 40].attr2 = ATTR2_TILEID(0, (3 * 4)+2);
+        }
+    }
+}

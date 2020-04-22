@@ -401,6 +401,70 @@ start:
 	.word	initGame
 	.size	start, .-start
 	.align	2
+	.global	goToPause
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	goToPause, %function
+goToPause:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, lr}
+	mov	r5, #3
+	ldr	r3, .L49
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L49+4
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L49+8
+	mov	lr, pc
+	bx	r3
+	ldr	r4, .L49+12
+	mov	r0, r5
+	mov	r3, #512
+	mov	r2, #117440512
+	ldr	r1, .L49+16
+	mov	lr, pc
+	bx	r4
+	ldr	ip, .L49+20
+	mov	r0, r5
+	mov	r3, #256
+	mov	r2, #83886080
+	ldr	r1, .L49+24
+	str	r5, [ip]
+	mov	lr, pc
+	bx	r4
+	mov	r0, r5
+	mov	r3, #864
+	mov	r2, #100663296
+	ldr	r1, .L49+28
+	mov	lr, pc
+	bx	r4
+	mov	r0, r5
+	mov	r3, #1024
+	ldr	r2, .L49+32
+	ldr	r1, .L49+36
+	mov	lr, pc
+	bx	r4
+	pop	{r4, r5, r6, lr}
+	bx	lr
+.L50:
+	.align	2
+.L49:
+	.word	pauseSound
+	.word	hideSprites
+	.word	waitForVBlank
+	.word	DMANow
+	.word	shadowOAM
+	.word	state
+	.word	pausescreenPal
+	.word	pausescreenTiles
+	.word	100696064
+	.word	pausescreenMap
+	.size	goToPause, .-goToPause
+	.align	2
 	.global	game
 	.syntax unified
 	.arm
@@ -411,65 +475,34 @@ game:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L54
-	ldr	r4, .L54+4
+	ldr	r3, .L58
 	mov	lr, pc
 	bx	r3
+	ldr	r3, .L58+4
 	mov	lr, pc
-	bx	r4
-	ldr	r3, .L54+8
+	bx	r3
+	ldr	r3, .L58+8
 	ldrh	r3, [r3]
 	tst	r3, #8
-	beq	.L47
-	ldr	r3, .L54+12
+	beq	.L51
+	ldr	r3, .L58+12
 	ldrh	r3, [r3]
 	tst	r3, #8
-	beq	.L53
-.L47:
+	beq	.L57
+.L51:
 	pop	{r4, lr}
 	bx	lr
-.L53:
-	mov	lr, pc
-	bx	r4
-	mov	r2, #3
-	ldr	r3, .L54+16
+.L57:
 	pop	{r4, lr}
-	str	r2, [r3]
-	bx	lr
-.L55:
+	b	goToPause
+.L59:
 	.align	2
-.L54:
+.L58:
 	.word	updateGame
 	.word	waitForVBlank
 	.word	oldButtons
 	.word	buttons
-	.word	state
 	.size	game, .-game
-	.align	2
-	.global	goToPause
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	goToPause, %function
-goToPause:
-	@ Function supports interworking.
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
-	ldr	r3, .L58
-	mov	lr, pc
-	bx	r3
-	mov	r2, #3
-	ldr	r3, .L58+4
-	pop	{r4, lr}
-	str	r2, [r3]
-	bx	lr
-.L59:
-	.align	2
-.L58:
-	.word	waitForVBlank
-	.word	state
-	.size	goToPause, .-goToPause
 	.align	2
 	.global	pause
 	.syntax unified
@@ -503,17 +536,30 @@ pause:
 	pop	{r4, lr}
 	bx	lr
 .L70:
+	bl	goToGame
+	ldr	r3, .L72+12
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L72+16
+	mov	lr, pc
+	bx	r3
 	pop	{r4, lr}
-	b	goToGame
+	bx	lr
 .L71:
+	bl	goToStart
+	ldr	r3, .L72+12
+	mov	lr, pc
+	bx	r3
 	pop	{r4, lr}
-	b	goToStart
+	bx	lr
 .L73:
 	.align	2
 .L72:
 	.word	waitForVBlank
 	.word	oldButtons
 	.word	buttons
+	.word	unpauseSound
+	.word	drawHearts
 	.size	pause, .-pause
 	.align	2
 	.global	goToWin

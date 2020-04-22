@@ -37,6 +37,7 @@ void updateHearts();
 void findSafeRowAndColForEnemy();
 void findRowAndColForQuarantine();
 void fireSyringe();
+void drawHearts();
 
 typedef struct {
     int row;

@@ -239,7 +239,7 @@ void initGame() {
     initPlayer();
     initEnemies();
     enemiesOnScreen = 0;
-    enemySpawnRate = 200 + (rand()%50);
+    enemySpawnRate = 150 + (rand()%50);
     enemiesKilled = 0;
     initQuarantines();
     quarantinesOnScreen = 0;
@@ -672,6 +672,16 @@ void fireSyringe() {
             syringes[i].col = player.col + player.width;
 
             break;
+        }
+    }
+}
+
+void drawHearts() {
+    for (int i = 0; i < 5; i++) {
+        if (hearts[i].active) {
+            shadowOAM[i + 40].attr0 = hearts[i].row | (0<<13) | (0<<14);
+            shadowOAM[i + 40].attr1 = hearts[i].col | (0<<14);
+            shadowOAM[i + 40].attr2 = (((3 * 4)+2)*32+(0));
         }
     }
 }
