@@ -1020,59 +1020,65 @@ updateQuarantines:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, r9, r10, lr}
-	ldr	r7, .L200
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	ldr	r7, .L202
 	ldr	r3, [r7]
 	cmp	r3, #4
-	sub	sp, sp, #16
+	sub	sp, sp, #20
 	bgt	.L174
-	ldr	r0, .L200+4
+	ldr	r0, .L202+4
 	mov	r3, #0
 	mov	r2, r0
 .L177:
 	ldr	r1, [r2, #24]
 	cmp	r1, #0
-	beq	.L198
+	beq	.L199
 	add	r3, r3, #1
 	cmp	r3, #5
 	add	r2, r2, #52
 	bne	.L177
 .L174:
-	ldr	r4, .L200+4
-	ldr	r5, .L200+8
-	ldr	r9, .L200+12
-	ldr	r8, .L200+16
-	ldr	r10, .L200+20
+	ldr	r4, .L202+4
+	ldr	r5, .L202+8
+	ldr	r9, .L202+12
+	ldr	fp, .L202+16
+	ldr	r10, .L202+20
+	ldr	r8, .L202+24
 	add	r6, r4, #260
-.L187:
+.L188:
 	ldr	r3, [r4, #24]
 	cmp	r3, #0
 	beq	.L178
 	ldr	r3, [r4, #36]
-	ldr	r1, [r4, #40]
-	cmp	r3, r1
-	beq	.L199
+	ldr	r2, [r4, #40]
+	cmp	r3, r2
+	beq	.L200
 .L180:
 	ldr	r2, [r4, #44]
 	add	r2, r2, #1
-	cmp	r2, #50
+	cmp	r2, #34
 	str	r2, [r4, #44]
+	beq	.L201
+.L182:
+	cmp	r2, #50
 	moveq	r2, #0
 	addeq	r3, r3, #1
-	streq	r2, [r4, #44]
-	sub	r2, r3, #2
 	streq	r3, [r4, #36]
+	streq	r2, [r4, #44]
+.L183:
+	sub	r2, r3, #2
 	cmp	r2, #1
-	bhi	.L184
+	bhi	.L185
 	cmp	r3, #2
 	movne	r2, #2
 	moveq	r3, #3
 	movne	r3, r2
 	streq	r3, [r4, #36]
 	strne	r2, [r4, #36]
-.L184:
-	cmp	r1, r3
-	bge	.L186
+.L185:
+	ldr	r2, [r4, #40]
+	cmp	r2, r3
+	bge	.L187
 	mov	r1, #0
 	mov	r2, #512
 	ldr	r3, [r7]
@@ -1084,12 +1090,12 @@ updateQuarantines:
 	add	r4, r4, #52
 	cmp	r4, r6
 	add	r5, r5, #8
-	bne	.L187
-	add	sp, sp, #16
+	bne	.L188
+	add	sp, sp, #20
 	@ sp needed
-	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L186:
+.L187:
 	add	r3, r3, #63
 	lsl	r3, r3, #2
 	ldr	r2, [r4, #4]
@@ -1099,7 +1105,19 @@ updateQuarantines:
 	strh	r2, [r5, #74]	@ movhi
 	strh	r3, [r5, #72]	@ movhi
 	b	.L178
-.L199:
+.L201:
+	cmp	r3, #3
+	bne	.L183
+	mov	r2, #0
+	ldr	r3, .L202+28
+	mov	r1, fp
+	mov	r0, r10
+	mov	lr, pc
+	bx	r3
+	ldr	r2, [r4, #44]
+	ldr	r3, [r4, #36]
+	b	.L182
+.L200:
 	ldr	r2, [r4, #48]
 	cmp	r2, #0
 	bne	.L180
@@ -1114,8 +1132,9 @@ updateQuarantines:
 	ldm	r2, {r2, r3}
 	ldr	r1, [r8]
 	ldr	r0, [r8, #4]
+	ldr	ip, .L202+32
 	mov	lr, pc
-	bx	r10
+	bx	ip
 	cmp	r0, #0
 	movne	r2, #1
 	ldrne	r3, [r8, #28]
@@ -1124,13 +1143,12 @@ updateQuarantines:
 	strne	r2, [r4, #48]
 	strne	r2, [r8, #32]
 	ldr	r3, [r4, #36]
-	ldr	r1, [r4, #40]
 	b	.L180
-.L198:
+.L199:
 	add	r2, r3, r3, lsl #1
 	add	r3, r3, r2, lsl #2
 	add	r0, r0, r3, lsl #2
-	ldr	r2, .L200+24
+	ldr	r2, .L202+36
 	ldr	r3, [r0, #32]
 	ldr	r2, [r2]
 	add	r3, r3, #1
@@ -1149,14 +1167,17 @@ updateQuarantines:
 	add	r3, r3, #1
 	str	r3, [r7]
 	b	.L174
-.L201:
+.L203:
 	.align	2
-.L200:
+.L202:
 	.word	quarantinesOnScreen
 	.word	quarantines
 	.word	shadowOAM
 	.word	-32768
+	.word	26725
+	.word	quarantinesound
 	.word	player
+	.word	playSoundB
 	.word	collision
 	.word	quarantineSpawnRate
 	.size	updateQuarantines, .-updateQuarantines
@@ -1170,22 +1191,22 @@ fireSyringe:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r0, .L212
+	ldr	r0, .L214
 	mov	r3, #0
 	mov	r2, r0
-	b	.L205
-.L203:
+	b	.L207
+.L205:
 	add	r3, r3, #1
 	cmp	r3, #10
 	add	r2, r2, #28
 	bxeq	lr
-.L205:
+.L207:
 	ldr	r1, [r2, #20]
 	cmp	r1, #0
-	bne	.L203
+	bne	.L205
 	push	{r4, r5, r6, lr}
 	mov	r6, #1
-	ldr	lr, .L212+4
+	ldr	lr, .L214+4
 	rsb	r3, r3, r3, lsl #3
 	ldr	r2, [lr, #20]
 	add	ip, r0, r3, lsl #2
@@ -1204,9 +1225,9 @@ fireSyringe:
 	str	r2, [r0, r3, lsl #2]
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L213:
+.L215:
 	.align	2
-.L212:
+.L214:
 	.word	syringes
 	.word	player
 	.size	fireSyringe, .-fireSyringe
@@ -1220,95 +1241,95 @@ updatePlayer:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r3, .L243
+	ldr	r3, .L245
 	ldrh	r3, [r3]
 	tst	r3, #64
 	push	{r4, lr}
-	bne	.L236
-	ldr	r4, .L243+4
-.L215:
+	bne	.L238
+	ldr	r4, .L245+4
+.L217:
 	tst	r3, #128
-	beq	.L216
-	ldr	r2, .L243+8
+	beq	.L218
+	ldr	r2, .L245+8
 	ldrh	r2, [r2]
 	tst	r2, #128
-	beq	.L239
-.L216:
-	tst	r3, #32
-	beq	.L217
-	ldr	r2, .L243+8
-	ldrh	r2, [r2]
-	tst	r2, #32
-	beq	.L240
-.L217:
-	tst	r3, #16
-	beq	.L218
-	ldr	r2, .L243+8
-	ldrh	r2, [r2]
-	tst	r2, #16
 	beq	.L241
 .L218:
-	tst	r3, #1
+	tst	r3, #32
 	beq	.L219
-	ldr	r3, .L243+8
-	ldrh	r3, [r3]
-	tst	r3, #1
+	ldr	r2, .L245+8
+	ldrh	r2, [r2]
+	tst	r2, #32
 	beq	.L242
 .L219:
+	tst	r3, #16
+	beq	.L220
+	ldr	r2, .L245+8
+	ldrh	r2, [r2]
+	tst	r2, #16
+	beq	.L243
+.L220:
+	tst	r3, #1
+	beq	.L221
+	ldr	r3, .L245+8
+	ldrh	r3, [r3]
+	tst	r3, #1
+	beq	.L244
+.L221:
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	ble	.L214
+	ble	.L216
 	ldr	r3, [r4, #4]
 	mvn	r3, r3, lsl #17
 	mov	r1, #0
 	mvn	r3, r3, lsr #17
-	ldr	r2, .L243+12
+	ldr	r2, .L245+12
 	ldr	r0, [r4]
 	strh	r3, [r2, #2]	@ movhi
 	strh	r0, [r2]	@ movhi
 	strh	r1, [r2, #4]	@ movhi
-.L214:
+.L216:
 	pop	{r4, lr}
 	bx	lr
-.L236:
-	ldr	r2, .L243+8
+.L238:
+	ldr	r2, .L245+8
 	ldrh	r2, [r2]
 	tst	r2, #64
-	ldr	r4, .L243+4
-	bne	.L215
+	ldr	r4, .L245+4
+	bne	.L217
 	ldr	r2, [r4]
 	cmp	r2, #4
 	ldrgt	r1, [r4, #12]
 	subgt	r2, r2, r1
 	strgt	r2, [r4]
-	b	.L215
-.L241:
+	b	.L217
+.L243:
 	ldr	r2, [r4, #4]
 	cmp	r2, #83
 	ldrle	r1, [r4, #8]
 	addle	r2, r1, r2
 	strle	r2, [r4, #4]
-	b	.L218
-.L240:
+	b	.L220
+.L242:
 	ldr	r2, [r4, #4]
 	cmp	r2, #4
 	ldrgt	r1, [r4, #8]
 	subgt	r2, r2, r1
 	strgt	r2, [r4, #4]
-	b	.L217
-.L239:
+	b	.L219
+.L241:
 	ldr	r2, [r4]
 	cmp	r2, #123
 	ldrle	r1, [r4, #12]
 	addle	r2, r1, r2
 	strle	r2, [r4]
-	b	.L216
-.L242:
-	bl	fireSyringe
-	b	.L219
+	b	.L218
 .L244:
+	bl	fireSyringe
+	b	.L221
+.L246:
 	.align	2
-.L243:
+.L245:
 	.word	oldButtons
 	.word	player
 	.word	buttons
@@ -1325,7 +1346,7 @@ updateGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r4, .L255
+	ldr	r4, .L257
 	bl	updatePlayer
 	bl	updateEnemies
 	bl	updateQuarantines
@@ -1334,42 +1355,42 @@ updateGame:
 	ldr	r3, [r4, #32]
 	cmp	r3, #0
 	blne	updateHearts.part.0
-.L246:
-	ldr	r3, .L255+4
+.L248:
+	ldr	r3, .L257+4
 	ldr	r3, [r3]
 	cmp	r3, #9
-	bgt	.L253
+	bgt	.L255
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	ble	.L254
-.L248:
-	ldr	r3, .L255+8
+	ble	.L256
+.L250:
+	ldr	r3, .L257+8
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L255+12
+	ldr	r4, .L257+12
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L255+16
+	ldr	r1, .L257+16
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
 	bx	lr
-.L253:
-	ldr	r3, .L255+20
+.L255:
+	ldr	r3, .L257+20
 	mov	lr, pc
 	bx	r3
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	bgt	.L248
-.L254:
-	ldr	r3, .L255+24
+	bgt	.L250
+.L256:
+	ldr	r3, .L257+24
 	mov	lr, pc
 	bx	r3
-	b	.L248
-.L256:
+	b	.L250
+.L258:
 	.align	2
-.L255:
+.L257:
 	.word	player
 	.word	enemiesKilled
 	.word	waitForVBlank

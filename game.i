@@ -212,6 +212,13 @@ extern const unsigned short spritesheetTiles[16384];
 
 extern const unsigned short spritesheetPal[256];
 # 4 "game.c" 2
+# 1 "quarantinesound.h" 1
+
+
+
+
+extern const signed char quarantinesound[26725];
+# 5 "game.c" 2
 
 
 OBJ_ATTR shadowOAM[128];
@@ -481,6 +488,9 @@ void updateQuarantines() {
             }
 
             quarantines[i].aniCounter++;
+            if (quarantines[i].aniCounter == 34 && quarantines[i].curFrame == 3) {
+                playSoundB(quarantinesound, 26725, 0);
+            }
             if (quarantines[i].aniCounter == 50) {
                 quarantines[i].aniCounter = 0;
 

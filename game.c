@@ -1,6 +1,7 @@
 #include "myLib.h"
 #include "game.h"
 #include "spritesheet.h"
+#include "quarantinesound.h"
 
 //prototypes
 OBJ_ATTR shadowOAM[128]; //shadowOAM to DMA into realOAM
@@ -270,6 +271,9 @@ void updateQuarantines() {
             }
             //update aniCounter
             quarantines[i].aniCounter++;
+            if (quarantines[i].aniCounter == 34 && quarantines[i].curFrame == 3) { //this if is to time it correctly
+                playSoundB(quarantinesound, QUARANTINESOUNDLEN, 0);
+            }
             if (quarantines[i].aniCounter == QUARANTINEANIMATIONRATE) {
                 quarantines[i].aniCounter = 0; //reset aniCounter
                 //go up a frame
