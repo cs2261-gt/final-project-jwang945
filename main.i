@@ -158,7 +158,7 @@ extern const unsigned short winscreenPal[256];
 # 12 "main.c" 2
 # 1 "instructionsscreen.h" 1
 # 22 "instructionsscreen.h"
-extern const unsigned short instructionsscreenTiles[176];
+extern const unsigned short instructionsscreenTiles[4352];
 
 
 extern const unsigned short instructionsscreenMap[1024];
@@ -335,7 +335,7 @@ void goToInstructions() {
 
     DMANow(3, instructionsscreenPal, ((unsigned short *)0x5000000), 256);
 
-    DMANow(3, instructionsscreenTiles, &((charblock *)0x6000000)[0], 352/2);
+    DMANow(3, instructionsscreenTiles, &((charblock *)0x6000000)[0], 8704/2);
 
     DMANow(3, instructionsscreenMap, &((screenblock *)0x6000000)[16], 2048/2);
 }

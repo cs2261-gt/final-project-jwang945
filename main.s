@@ -188,7 +188,7 @@ goToInstructions:
 	str	lr, [ip]
 	mov	lr, pc
 	bx	r4
-	mov	r3, #176
+	mov	r3, #4352
 	mov	r2, #100663296
 	mov	r0, #3
 	ldr	r1, .L14+12
