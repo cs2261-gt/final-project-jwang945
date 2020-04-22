@@ -397,8 +397,6 @@ void game() {
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3)))))
         goToPause();
-    else if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1)))))
-        goToLose();
 }
 
 void goToPause() {

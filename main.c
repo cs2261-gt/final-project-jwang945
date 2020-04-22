@@ -204,8 +204,6 @@ void game() {
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START))
         goToPause();
-    else if (BUTTON_PRESSED(BUTTON_B))
-        goToLose();
 }
 
 void goToPause() {
