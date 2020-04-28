@@ -435,7 +435,6 @@ void game() {
 }
 
 void goToPause() {
-    playSoundB(pingsound, 2931, 0);
     pauseSound();
     hideSprites();
     waitForVBlank();

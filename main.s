@@ -443,46 +443,40 @@ goToPause:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
 	mov	r5, #3
-	mov	r2, #0
-	ldr	r1, .L49
-	ldr	r0, .L49+4
+	ldr	r3, .L49
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L49+4
+	mov	lr, pc
+	bx	r3
 	ldr	r3, .L49+8
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L49+12
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L49+16
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L49+20
-	mov	lr, pc
-	bx	r3
-	ldr	r4, .L49+24
+	ldr	r4, .L49+12
 	mov	r0, r5
 	mov	r3, #512
 	mov	r2, #117440512
-	ldr	r1, .L49+28
+	ldr	r1, .L49+16
 	mov	lr, pc
 	bx	r4
-	ldr	ip, .L49+32
+	ldr	ip, .L49+20
 	mov	r0, r5
 	mov	r3, #256
 	mov	r2, #83886080
-	ldr	r1, .L49+36
+	ldr	r1, .L49+24
 	str	r5, [ip]
 	mov	lr, pc
 	bx	r4
 	mov	r0, r5
 	mov	r3, #864
 	mov	r2, #100663296
-	ldr	r1, .L49+40
+	ldr	r1, .L49+28
 	mov	lr, pc
 	bx	r4
 	mov	r0, r5
 	mov	r3, #1024
-	ldr	r2, .L49+44
-	ldr	r1, .L49+48
+	ldr	r2, .L49+32
+	ldr	r1, .L49+36
 	mov	lr, pc
 	bx	r4
 	pop	{r4, r5, r6, lr}
@@ -490,9 +484,6 @@ goToPause:
 .L50:
 	.align	2
 .L49:
-	.word	2931
-	.word	pingsound
-	.word	playSoundB
 	.word	pauseSound
 	.word	hideSprites
 	.word	waitForVBlank
