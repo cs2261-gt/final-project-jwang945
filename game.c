@@ -47,6 +47,10 @@ void initPlayer() {
     player.damage = 1;
     player.health = MAXHEARTS;
     player.tookDamageFlag = 0;
+    player.aniCounter = 0;
+    player.curFrame = 1;
+    player.numFrames = 2;
+    player.cheatFlag = 0;
     //shadowOAM player
     shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
     shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
@@ -165,11 +169,26 @@ void updatePlayer() {
     if (BUTTON_PRESSED(BUTTON_A)) {
         fireSyringe();
     }
+    //check cheatFlag
+    if (BUTTON_PRESSED(BUTTON_B)) {
+        player.cheatFlag = !player.cheatFlag; //switch cheatFlag
+        if (player.cheatFlag) {
+            player.damage = enemies[0].health + 1; //if toggle cheat, then one-hit kill the enemies
+        } else {
+            player.damage = 1;
+        }
+    }
+    //player animation
+    player.aniCounter++;
+    if (player.aniCounter == PLAYERANIIMATIONRATE) {
+        player.aniCounter = 0;
+        player.curFrame = player.curFrame==player.numFrames ? 1 : player.curFrame + 1; //if on last frame, reset to 0, else add 1
+    }
     if (player.health > 0) { //only draw if player is still alive
     //shadowOAM player
         shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
         shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
-        shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
+        shadowOAM[0].attr2 = ATTR2_TILEID((player.curFrame - 1)*4, 0);
     }
 }
 
@@ -320,7 +339,7 @@ void updateSyringes() {
                         syringes[i].active = 0;
                         syringes[i].erased = 1;
                         //damage enemy
-                        enemies[j].health -= player.damage;
+                        enemies[j].health -= syringes[i].damage;
                         //check if kill enemy in updateEnemies();
                     }
                 }
@@ -450,6 +469,8 @@ void fireSyringe() {
             //activate it
             syringes[i].active = 1;
             syringes[i].erased = 0;
+            //set its damage
+            syringes[i].damage = player.damage;
             //fire from player's location
             syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
             syringes[i].col = player.col + player.width;

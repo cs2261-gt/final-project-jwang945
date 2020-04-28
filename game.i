@@ -111,7 +111,7 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 20 "game.h"
+# 21 "game.h"
 int rand();
 void goToLose();
 void goToWin();
@@ -132,6 +132,7 @@ void updateHearts();
 void findSafeRowAndColForEnemy();
 void findRowAndColForQuarantine();
 void fireSyringe();
+void drawHearts();
 
 typedef struct {
     int row;
@@ -143,6 +144,10 @@ typedef struct {
     int damage;
     int health;
     int tookDamageFlag;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
+    int cheatFlag;
 } PLAYER;
 
 typedef struct {
@@ -184,6 +189,7 @@ typedef struct {
     int cdel;
     int width;
     int height;
+    int damage;
     int active;
     int erased;
 } SYRINGE;
@@ -264,6 +270,10 @@ void initPlayer() {
     player.damage = 1;
     player.health = 5;
     player.tookDamageFlag = 0;
+    player.aniCounter = 0;
+    player.curFrame = 1;
+    player.numFrames = 2;
+    player.cheatFlag = 0;
 
     shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
     shadowOAM[0].attr1 = player.col | (2<<14);
@@ -382,11 +392,26 @@ void updatePlayer() {
     if ((!(~(oldButtons)&((1<<0))) && (~buttons & ((1<<0))))) {
         fireSyringe();
     }
+
+    if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1))))) {
+        player.cheatFlag = !player.cheatFlag;
+        if (player.cheatFlag) {
+            player.damage = enemies[0].health + 1;
+        } else {
+            player.damage = 1;
+        }
+    }
+
+    player.aniCounter++;
+    if (player.aniCounter == 70) {
+        player.aniCounter = 0;
+        player.curFrame = player.curFrame==player.numFrames ? 1 : player.curFrame + 1;
+    }
     if (player.health > 0) {
 
         shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
         shadowOAM[0].attr1 = player.col | (2<<14);
-        shadowOAM[0].attr2 = ((0)*32+(0));
+        shadowOAM[0].attr2 = ((0)*32+((player.curFrame - 1)*4));
     }
 }
 
@@ -537,7 +562,7 @@ void updateSyringes() {
                         syringes[i].active = 0;
                         syringes[i].erased = 1;
 
-                        enemies[j].health -= player.damage;
+                        enemies[j].health -= syringes[i].damage;
 
                     }
                 }
@@ -667,6 +692,8 @@ void fireSyringe() {
 
             syringes[i].active = 1;
             syringes[i].erased = 0;
+
+            syringes[i].damage = player.damage;
 
             syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
             syringes[i].col = player.col + player.width;

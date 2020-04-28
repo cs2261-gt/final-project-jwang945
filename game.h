@@ -1,6 +1,7 @@
 #define PLAYERROWS 4
 #define PLAYERCOLS 3
 #define PLAYERSPRITESCALE 4
+#define PLAYERANIIMATIONRATE 70
 #define MAXENEMIES 8
 #define ENEMYSPAWNRATEBASE 150
 #define ENEMYANIMATIONRATE 50
@@ -49,6 +50,10 @@ typedef struct {
     int damage;
     int health;
     int tookDamageFlag;
+    int curFrame;
+    int numFrames;
+    int aniCounter;
+    int cheatFlag;
 } PLAYER;
 
 typedef struct {
@@ -90,6 +95,7 @@ typedef struct {
     int cdel;
     int width;
     int height;
+    int damage;
     int active;
     int erased;
 } SYRINGE;
