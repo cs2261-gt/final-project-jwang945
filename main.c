@@ -15,6 +15,8 @@ Control the player on the left side of the grid and press A to shoot. Kill 10 en
 #include "sound.h"
 #include "backgroundmusic.h"
 #include "winsound.h"
+#include "losesound.h"
+#include "pingsound.h"
 
 #define CURSORROWSPACE 20
 
@@ -147,15 +149,18 @@ void start() {
 
     seed++; //increment seed depending on how long user stays on start screen
     if (BUTTON_PRESSED(BUTTON_DOWN) && startScreenIndex == 0) {
+        playSoundB(pingsound, PINGSOUNDLEN, 0);
         startScreenIndex++;
         cursorRow += CURSORROWSPACE;
     }
     if (BUTTON_PRESSED(BUTTON_UP) && startScreenIndex == 1) {
+        playSoundB(pingsound, PINGSOUNDLEN, 0);
         startScreenIndex--;
         cursorRow -= CURSORROWSPACE;
     }
     // State transitions
     if (BUTTON_PRESSED(BUTTON_START)) {
+        //playSoundB(pingsound, PINGSOUNDLEN, 0);
         shadowOAM[127].attr0 = ATTR0_HIDE; //hide the cursor
         switch(startScreenIndex) {
             case 0:
@@ -184,6 +189,8 @@ void instructions() {
     waitForVBlank();
     if (BUTTON_PRESSED(BUTTON_START)) {
         initialize();
+        cursorRow += CURSORROWSPACE;
+        startScreenIndex = 1;
     }
 }
 
@@ -276,6 +283,7 @@ void win() {
 }
 
 void goToLose() {
+    playSoundB(losesound, LOSESOUNDLEN, 0);
     hideSprites();
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 128 * 4);

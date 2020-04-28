@@ -223,6 +223,20 @@ extern const signed char backgroundmusic[1772064];
 
 extern const signed char winsound[23020];
 # 18 "main.c" 2
+# 1 "losesound.h" 1
+
+
+
+
+extern const signed char losesound[34927];
+# 19 "main.c" 2
+# 1 "pingsound.h" 1
+
+
+
+
+extern const signed char pingsound[2931];
+# 20 "main.c" 2
 
 
 
@@ -355,15 +369,18 @@ void start() {
 
     seed++;
     if ((!(~(oldButtons)&((1<<7))) && (~buttons & ((1<<7)))) && startScreenIndex == 0) {
+        playSoundB(pingsound, 2931, 0);
         startScreenIndex++;
         cursorRow += 20;
     }
     if ((!(~(oldButtons)&((1<<6))) && (~buttons & ((1<<6)))) && startScreenIndex == 1) {
+        playSoundB(pingsound, 2931, 0);
         startScreenIndex--;
         cursorRow -= 20;
     }
 
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
+
         shadowOAM[127].attr0 = (2<<8);
         switch(startScreenIndex) {
             case 0:
@@ -392,6 +409,8 @@ void instructions() {
     waitForVBlank();
     if ((!(~(oldButtons)&((1<<3))) && (~buttons & ((1<<3))))) {
         initialize();
+        cursorRow += 20;
+        startScreenIndex = 1;
     }
 }
 
@@ -416,6 +435,7 @@ void game() {
 }
 
 void goToPause() {
+    playSoundB(pingsound, 2931, 0);
     pauseSound();
     hideSprites();
     waitForVBlank();
@@ -484,6 +504,7 @@ void win() {
 }
 
 void goToLose() {
+    playSoundB(losesound, 34927, 0);
     hideSprites();
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);
