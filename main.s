@@ -572,63 +572,69 @@ goToWin:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L76
+	mov	r2, #0
+	ldr	r1, .L76
+	ldr	r0, .L76+4
+	ldr	r3, .L76+8
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L76+4
+	ldr	r3, .L76+12
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L76+8
+	ldr	r3, .L76+16
+	mov	lr, pc
+	bx	r3
+	ldr	r4, .L76+20
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L76+12
+	ldr	r1, .L76+24
 	mov	lr, pc
 	bx	r4
 	mov	ip, #4
-	ldr	r0, .L76+16
+	ldr	r0, .L76+28
 	mov	r3, #256
 	str	ip, [r0]
 	mov	r2, #83886080
 	mov	r0, #3
-	ldr	r1, .L76+20
+	ldr	r1, .L76+32
 	mov	lr, pc
 	bx	r4
 	mov	r3, #528
 	mov	r2, #100663296
 	mov	r0, #3
-	ldr	r1, .L76+24
+	ldr	r1, .L76+36
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L76+28
-	ldr	r1, .L76+32
+	ldr	r2, .L76+40
+	ldr	r1, .L76+44
 	mov	lr, pc
 	bx	r4
 	mov	r3, #67108864
 	ldrh	r2, [r3]
-	ldr	r1, .L76+36
+	ldr	r1, .L76+48
 	orr	r2, r2, #512
 	strh	r2, [r3]	@ movhi
 	strh	r1, [r3, #10]	@ movhi
 	mov	r0, #3
 	mov	r3, #8128
-	ldr	r2, .L76+40
-	ldr	r1, .L76+44
+	ldr	r2, .L76+52
+	ldr	r1, .L76+56
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L76+48
-	ldr	r1, .L76+52
+	ldr	r2, .L76+60
+	ldr	r1, .L76+64
 	mov	lr, pc
 	bx	r4
 	mov	r3, #0
-	ldr	ip, .L76+56
-	ldr	r0, .L76+60
-	ldr	r1, .L76+64
-	ldr	r2, .L76+68
+	ldr	ip, .L76+68
+	ldr	r0, .L76+72
+	ldr	r1, .L76+76
+	ldr	r2, .L76+80
 	str	r3, [ip]
 	str	r3, [r0]
 	strh	r3, [r1]	@ movhi
@@ -638,6 +644,9 @@ goToWin:
 .L77:
 	.align	2
 .L76:
+	.word	23020
+	.word	winsound
+	.word	playSoundB
 	.word	hideSprites
 	.word	waitForVBlank
 	.word	DMANow

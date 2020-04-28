@@ -225,6 +225,20 @@ extern const unsigned short spritesheetPal[256];
 
 extern const signed char quarantinesound[26725];
 # 5 "game.c" 2
+# 1 "cheaton.h" 1
+
+
+
+
+extern const signed char cheaton[16934];
+# 6 "game.c" 2
+# 1 "cheatoff.h" 1
+
+
+
+
+extern const signed char cheatoff[13685];
+# 7 "game.c" 2
 
 
 OBJ_ATTR shadowOAM[128];
@@ -249,7 +263,7 @@ void initGame() {
     enemiesKilled = 0;
     initQuarantines();
     quarantinesOnScreen = 0;
-    quarantineSpawnRate = 100 + (rand()%100);
+    quarantineSpawnRate = 80 + (rand()%100);
     initSyringes();
     initRNAs();
     initHearts();
@@ -394,6 +408,11 @@ void updatePlayer() {
     }
 
     if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1))))) {
+        if (player.cheatFlag) {
+            playSoundB(cheatoff, 13685, 0);
+        } else {
+            playSoundB(cheaton, 16934, 0);
+        }
         player.cheatFlag = !player.cheatFlag;
         if (player.cheatFlag) {
             player.damage = 10 + 1;

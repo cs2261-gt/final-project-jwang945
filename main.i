@@ -216,6 +216,13 @@ void stopSound();
 
 extern const signed char backgroundmusic[1772064];
 # 17 "main.c" 2
+# 1 "winsound.h" 1
+
+
+
+
+extern const signed char winsound[23020];
+# 18 "main.c" 2
 
 
 
@@ -436,6 +443,7 @@ void pause() {
 }
 
 void goToWin() {
+    playSoundB(winsound, 23020, 0);
     hideSprites();
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR*)(0x7000000)), 128 * 4);

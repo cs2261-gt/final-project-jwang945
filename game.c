@@ -2,6 +2,8 @@
 #include "game.h"
 #include "spritesheet.h"
 #include "quarantinesound.h"
+#include "cheaton.h"
+#include "cheatoff.h"
 
 //prototypes
 OBJ_ATTR shadowOAM[128]; //shadowOAM to DMA into realOAM
@@ -171,6 +173,11 @@ void updatePlayer() {
     }
     //check cheatFlag
     if (BUTTON_PRESSED(BUTTON_B)) {
+        if (player.cheatFlag) {
+            playSoundB(cheatoff, CHEATOFFLEN, 0);
+        } else {
+            playSoundB(cheaton, CHEATONLEN, 0);
+        }
         player.cheatFlag = !player.cheatFlag; //switch cheatFlag
         if (player.cheatFlag) {
             player.damage = ENEMYMAXHEALTH + 1; //if toggle cheat, then one-hit kill the enemies

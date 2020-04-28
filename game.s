@@ -217,7 +217,7 @@ initGame:
 	ldr	lr, .L35+28
 	ldr	ip, .L35+32
 	sub	r0, r0, r3, lsl r4
-	add	r0, r0, #100
+	add	r0, r0, #80
 	ldr	r3, .L35+36
 	str	r0, [lr]
 	ldr	lr, [ip]
@@ -1235,52 +1235,52 @@ updatePlayer:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
-	ldr	r5, .L257
+	ldr	r5, .L259
 	ldrh	r3, [r5]
 	tst	r3, #64
-	bne	.L249
-	ldr	r4, .L257+4
+	bne	.L251
+	ldr	r4, .L259+4
 .L219:
 	tst	r3, #128
 	beq	.L220
-	ldr	r2, .L257+8
+	ldr	r2, .L259+8
 	ldrh	r2, [r2]
 	tst	r2, #128
-	beq	.L252
+	beq	.L254
 .L220:
 	tst	r3, #32
 	beq	.L221
-	ldr	r2, .L257+8
+	ldr	r2, .L259+8
 	ldrh	r2, [r2]
 	tst	r2, #32
-	beq	.L253
+	beq	.L255
 .L221:
 	tst	r3, #16
 	beq	.L222
-	ldr	r2, .L257+8
+	ldr	r2, .L259+8
 	ldrh	r2, [r2]
 	tst	r2, #16
-	beq	.L254
+	beq	.L256
 .L222:
 	tst	r3, #1
 	beq	.L223
-	ldr	r2, .L257+8
+	ldr	r2, .L259+8
 	ldrh	r2, [r2]
 	tst	r2, #1
-	beq	.L255
+	beq	.L257
 .L223:
 	tst	r3, #2
 	beq	.L224
-	ldr	r3, .L257+8
-	ldrh	r3, [r3]
-	tst	r3, #2
-	beq	.L256
+	ldr	r3, .L259+8
+	ldrh	r2, [r3]
+	ands	r2, r2, #2
+	beq	.L258
 .L224:
 	ldr	r3, [r4, #44]
 	cmp	r3, #69
 	add	r3, r3, #1
 	strne	r3, [r4, #44]
-	bne	.L227
+	bne	.L229
 	ldr	r3, [r4, #36]
 	ldr	r1, [r4, #40]
 	cmp	r3, r1
@@ -1289,7 +1289,7 @@ updatePlayer:
 	addne	r3, r3, #1
 	str	r2, [r4, #44]
 	str	r3, [r4, #36]
-.L227:
+.L229:
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
 	ble	.L218
@@ -1297,7 +1297,7 @@ updatePlayer:
 	mvn	r2, r2, lsl #17
 	mvn	r2, r2, lsr #17
 	ldr	r3, [r4, #36]
-	ldr	r1, .L257+12
+	ldr	r1, .L259+12
 	ldr	r0, [r4]
 	sub	r3, r3, #1
 	lsl	r3, r3, #2
@@ -1307,7 +1307,17 @@ updatePlayer:
 .L218:
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L256:
+.L258:
+	ldr	r3, [r4, #48]
+	cmp	r3, #0
+	moveq	r2, r3
+	ldrne	r1, .L259+16
+	ldrne	r0, .L259+20
+	ldreq	r1, .L259+24
+	ldreq	r0, .L259+28
+	ldr	r3, .L259+32
+	mov	lr, pc
+	bx	r3
 	ldr	r3, [r4, #48]
 	cmp	r3, #0
 	moveq	r3, #1
@@ -1317,32 +1327,32 @@ updatePlayer:
 	movne	r3, #1
 	str	r3, [r4, #24]
 	b	.L224
-.L254:
+.L256:
 	ldr	r2, [r4, #4]
 	cmp	r2, #83
 	ldrle	r1, [r4, #8]
 	addle	r2, r1, r2
 	strle	r2, [r4, #4]
 	b	.L222
-.L253:
+.L255:
 	ldr	r2, [r4, #4]
 	cmp	r2, #4
 	ldrgt	r1, [r4, #8]
 	subgt	r2, r2, r1
 	strgt	r2, [r4, #4]
 	b	.L221
-.L252:
+.L254:
 	ldr	r2, [r4]
 	cmp	r2, #123
 	ldrle	r1, [r4, #12]
 	addle	r2, r1, r2
 	strle	r2, [r4]
 	b	.L220
-.L249:
-	ldr	r2, .L257+8
+.L251:
+	ldr	r2, .L259+8
 	ldrh	r2, [r2]
 	tst	r2, #64
-	ldr	r4, .L257+4
+	ldr	r4, .L259+4
 	bne	.L219
 	ldr	r2, [r4]
 	cmp	r2, #4
@@ -1350,17 +1360,22 @@ updatePlayer:
 	subgt	r2, r2, r1
 	strgt	r2, [r4]
 	b	.L219
-.L255:
+.L257:
 	bl	fireSyringe
 	ldrh	r3, [r5]
 	b	.L223
-.L258:
+.L260:
 	.align	2
-.L257:
+.L259:
 	.word	oldButtons
 	.word	player
 	.word	buttons
 	.word	shadowOAM
+	.word	13685
+	.word	cheatoff
+	.word	16934
+	.word	cheaton
+	.word	playSoundB
 	.size	updatePlayer, .-updatePlayer
 	.align	2
 	.global	updateGame
@@ -1373,7 +1388,7 @@ updateGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r4, .L269
+	ldr	r4, .L271
 	bl	updatePlayer
 	bl	updateEnemies
 	bl	updateQuarantines
@@ -1382,42 +1397,42 @@ updateGame:
 	ldr	r3, [r4, #32]
 	cmp	r3, #0
 	blne	updateHearts.part.0
-.L260:
-	ldr	r3, .L269+4
+.L262:
+	ldr	r3, .L271+4
 	ldr	r3, [r3]
 	cmp	r3, #9
-	bgt	.L267
+	bgt	.L269
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	ble	.L268
-.L262:
-	ldr	r3, .L269+8
+	ble	.L270
+.L264:
+	ldr	r3, .L271+8
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L269+12
+	ldr	r4, .L271+12
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L269+16
+	ldr	r1, .L271+16
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
 	bx	lr
-.L267:
-	ldr	r3, .L269+20
+.L269:
+	ldr	r3, .L271+20
 	mov	lr, pc
 	bx	r3
 	ldr	r3, [r4, #28]
 	cmp	r3, #0
-	bgt	.L262
-.L268:
-	ldr	r3, .L269+24
+	bgt	.L264
+.L270:
+	ldr	r3, .L271+24
 	mov	lr, pc
 	bx	r3
-	b	.L262
-.L270:
+	b	.L264
+.L272:
 	.align	2
-.L269:
+.L271:
 	.word	player
 	.word	enemiesKilled
 	.word	waitForVBlank
@@ -1438,10 +1453,10 @@ drawHearts:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	str	lr, [sp, #-4]!
 	mov	lr, #448
-	ldr	r3, .L279
-	ldr	r2, .L279+4
+	ldr	r3, .L281
+	ldr	r2, .L281+4
 	add	r0, r3, #40
-.L273:
+.L275:
 	ldr	r1, [r2, #8]
 	cmp	r1, #0
 	ldrne	ip, [r2]
@@ -1452,12 +1467,12 @@ drawHearts:
 	add	r3, r3, #8
 	cmp	r3, r0
 	add	r2, r2, #16
-	bne	.L273
+	bne	.L275
 	ldr	lr, [sp], #4
 	bx	lr
-.L280:
+.L282:
 	.align	2
-.L279:
+.L281:
 	.word	shadowOAM+320
 	.word	hearts
 	.size	drawHearts, .-drawHearts

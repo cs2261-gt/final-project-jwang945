@@ -14,6 +14,7 @@ Control the player on the left side of the grid and press A to shoot. Kill 10 en
 #include "retrobackground.h"
 #include "sound.h"
 #include "backgroundmusic.h"
+#include "winsound.h"
 
 #define CURSORROWSPACE 20
 
@@ -234,6 +235,7 @@ void pause() {
 }
 
 void goToWin() {
+    playSoundB(winsound, WINSOUNDLEN, 0);
     hideSprites();
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 128 * 4);
