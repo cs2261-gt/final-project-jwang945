@@ -53,6 +53,7 @@ void initPlayer() {
     player.curFrame = 1;
     player.numFrames = 2;
     player.cheatFlag = 0;
+    player.aniAttack = 0;
     //shadowOAM player
     shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
     shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
@@ -195,7 +196,17 @@ void updatePlayer() {
     //shadowOAM player
         shadowOAM[0].attr0 = player.row | ATTR0_4BPP | ATTR0_SQUARE;
         shadowOAM[0].attr1 = player.col | ATTR1_MEDIUM;
-        shadowOAM[0].attr2 = ATTR2_TILEID((player.curFrame - 1)*4, 0);
+        if (!player.aniAttack) {
+            shadowOAM[0].attr2 = ATTR2_TILEID((player.curFrame - 1)*4, 0);
+        } else {
+            if (player.aniAttack == 1) {
+                shadowOAM[0].attr2 = ATTR2_TILEID(2*4, 0);
+                player.aniAttack = 2;
+            } else {
+                shadowOAM[0].attr2 = ATTR2_TILEID(3*4, 0);
+                player.aniAttack = 0;
+            }
+        }
     }
 }
 
@@ -478,6 +489,8 @@ void fireSyringe() {
             syringes[i].erased = 0;
             //set its damage
             syringes[i].damage = player.damage;
+            //set player attack animation to begin
+            player.aniAttack = 1;
             //fire from player's location
             syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
             syringes[i].col = player.col + player.width;

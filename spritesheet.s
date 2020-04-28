@@ -935,9 +935,9 @@ spritesheetTiles:
 	.short	22391
 	.short	-22662
 	.short	22663
-	.short	31671
+	.short	29767
 	.short	22663
-	.short	31671
+	.short	29767
 	.short	21879
 	.short	-22662
 	.short	22391
@@ -950,7 +950,7 @@ spritesheetTiles:
 	.short	-21849
 	.short	-22699
 	.short	122
-	.short	31573
+	.short	29781
 	.short	30586
 	.short	21845
 	.short	31402
@@ -999,9 +999,9 @@ spritesheetTiles:
 	.short	22391
 	.short	-22662
 	.short	22663
-	.short	30567
+	.short	29767
 	.short	22663
-	.short	30311
+	.short	29767
 	.short	21879
 	.short	-22662
 	.short	22391
@@ -1014,7 +1014,7 @@ spritesheetTiles:
 	.short	-21849
 	.short	-22699
 	.short	122
-	.short	30293
+	.short	29781
 	.short	30586
 	.short	21845
 	.short	31402

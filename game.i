@@ -148,6 +148,7 @@ typedef struct {
     int numFrames;
     int aniCounter;
     int cheatFlag;
+    int aniAttack;
 } PLAYER;
 
 typedef struct {
@@ -237,7 +238,7 @@ extern const signed char cheaton[16934];
 
 
 
-extern const signed char cheatoff[13685];
+extern const signed char cheatoff[12141];
 # 7 "game.c" 2
 
 
@@ -288,6 +289,7 @@ void initPlayer() {
     player.curFrame = 1;
     player.numFrames = 2;
     player.cheatFlag = 0;
+    player.aniAttack = 0;
 
     shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
     shadowOAM[0].attr1 = player.col | (2<<14);
@@ -409,7 +411,7 @@ void updatePlayer() {
 
     if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1))))) {
         if (player.cheatFlag) {
-            playSoundB(cheatoff, 13685, 0);
+            playSoundB(cheatoff, 12141, 0);
         } else {
             playSoundB(cheaton, 16934, 0);
         }
@@ -430,7 +432,17 @@ void updatePlayer() {
 
         shadowOAM[0].attr0 = player.row | (0<<13) | (0<<14);
         shadowOAM[0].attr1 = player.col | (2<<14);
-        shadowOAM[0].attr2 = ((0)*32+((player.curFrame - 1)*4));
+        if (!player.aniAttack) {
+            shadowOAM[0].attr2 = ((0)*32+((player.curFrame - 1)*4));
+        } else {
+            if (player.aniAttack == 1) {
+                shadowOAM[0].attr2 = ((0)*32+(2*4));
+                player.aniAttack = 2;
+            } else {
+                shadowOAM[0].attr2 = ((0)*32+(3*4));
+                player.aniAttack = 0;
+            }
+        }
     }
 }
 
@@ -713,6 +725,8 @@ void fireSyringe() {
             syringes[i].erased = 0;
 
             syringes[i].damage = player.damage;
+
+            player.aniAttack = 1;
 
             syringes[i].row = player.row + player.height/2 - syringes[i].height/2;
             syringes[i].col = player.col + player.width;

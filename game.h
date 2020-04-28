@@ -55,6 +55,7 @@ typedef struct {
     int numFrames;
     int aniCounter;
     int cheatFlag;
+    int aniAttack;
 } PLAYER;
 
 typedef struct {
