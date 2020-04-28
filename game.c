@@ -66,7 +66,7 @@ void initEnemies() {
         enemies[i].rdel = 40;
         enemies[i].width = 32;
         enemies[i].height = 32;
-        enemies[i].health = 10;
+        enemies[i].health = ENEMYMAXHEALTH;
         enemies[i].active = 0;
         enemies[i].erased = 0;
         enemies[i].spawnTimer = 0;
@@ -173,7 +173,7 @@ void updatePlayer() {
     if (BUTTON_PRESSED(BUTTON_B)) {
         player.cheatFlag = !player.cheatFlag; //switch cheatFlag
         if (player.cheatFlag) {
-            player.damage = enemies[0].health + 1; //if toggle cheat, then one-hit kill the enemies
+            player.damage = ENEMYMAXHEALTH + 1; //if toggle cheat, then one-hit kill the enemies
         } else {
             player.damage = 1;
         }
@@ -351,7 +351,7 @@ void updateSyringes() {
                 if (player.health > 0) {
                     shadowOAM[i + 14].attr0 = syringes[i].row | ATTR0_4BPP | ATTR0_SQUARE;
                     shadowOAM[i + 14].attr1 = syringes[i].col | ATTR1_TINY;
-                    shadowOAM[i + 14].attr2 = ATTR2_TILEID(0, 3 * 4);
+                    shadowOAM[i + 14].attr2 = ATTR2_TILEID(syringes[i].damage==1?0:1, 3 * 4);
                 }
             }
         }

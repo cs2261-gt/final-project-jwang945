@@ -111,7 +111,7 @@ typedef struct{
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "game.c" 2
 # 1 "game.h" 1
-# 21 "game.h"
+# 22 "game.h"
 int rand();
 void goToLose();
 void goToWin();
@@ -396,7 +396,7 @@ void updatePlayer() {
     if ((!(~(oldButtons)&((1<<1))) && (~buttons & ((1<<1))))) {
         player.cheatFlag = !player.cheatFlag;
         if (player.cheatFlag) {
-            player.damage = enemies[0].health + 1;
+            player.damage = 10 + 1;
         } else {
             player.damage = 1;
         }
@@ -574,7 +574,7 @@ void updateSyringes() {
                 if (player.health > 0) {
                     shadowOAM[i + 14].attr0 = syringes[i].row | (0<<13) | (0<<14);
                     shadowOAM[i + 14].attr1 = syringes[i].col | (0<<14);
-                    shadowOAM[i + 14].attr2 = ((3 * 4)*32+(0));
+                    shadowOAM[i + 14].attr2 = ((3 * 4)*32+(syringes[i].damage==1?0:1));
                 }
             }
         }
